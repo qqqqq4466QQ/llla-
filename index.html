@@ -1,226 +1,881 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#04070b" />
-  <meta name="description" content="DJI Air 3S 交互式 3D 结构拆解实验室 — 由 Three.js 与代码实时生成。" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050a0e'/%3E%3Cg transform='skewX(-9) translate(12 12)'%3E%3Cpath d='M0 0h17v17L0 20Z' fill='%236fe7ff'/%3E%3Cpath d='M21 0h17v14L21 17Z' fill='%236fe7ff' opacity='.55'/%3E%3Cpath d='M0 24h17v14L0 40Z' fill='%236fe7ff' opacity='.55'/%3E%3Cpath d='M21 21h17v19H21Z' fill='%236fe7ff'/%3E%3C/g%3E%3C/svg%3E" />
-  <title>DJI Air 3S — 3D 结构拆解实验室</title>
-  <link rel="stylesheet" href="./styles.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#fff4f9" />
+<meta name="description" content="宁芙小站 · 导航页 — 这里放着站里所有好玩的东西，点一下就能进去。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23fff0f7'/%3E%3Ccircle cx='32' cy='36' r='16' fill='%23ffd0e6'/%3E%3Cpath d='M18 22l4 12-10-6z' fill='%23ffb3d9'/%3E%3Cpath d='M46 22l-4 12 10-6z' fill='%23ffb3d9'/%3E%3Ccircle cx='26' cy='36' r='2.6' fill='%235b4a63'/%3E%3Ccircle cx='38' cy='36' r='2.6' fill='%235b4a63'/%3E%3Cpath d='M28 43q4 3 8 0' stroke='%235b4a63' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='20' cy='41' r='3' fill='%23ff9ecb' opacity='.7'/%3E%3Ccircle cx='44' cy='41' r='3' fill='%23ff9ecb' opacity='.7'/%3E%3C/svg%3E" />
+<title>宁芙小站 · 导航页 ♡</title>
+<style>
+/* =========================================================
+   宁芙小站 · 导航页
+   日系动漫可爱风（pastel sakura）
+   ========================================================= */
+:root{
+  --pink:#ff8ec4;
+  --pink-deep:#f069a8;
+  --pink-soft:#ffd0e6;
+  --pink-pale:#fff0f7;
+  --mint:#7fe0c4;
+  --mint-pale:#e8fbf5;
+  --lav:#b9a8ff;
+  --lav-pale:#f1edff;
+  --lemon:#ffe27a;
+  --lemon-pale:#fff8dd;
+  --sky:#a9d8ff;
+  --sky-pale:#eaf5ff;
+  --cream:#fffaf4;
+  --ink:#54445e;
+  --ink-soft:#8b7a95;
+  --ink-faint:#b3a6ba;
+  --white:#fff;
+  --line:#ffe3f0;
+  --radius:28px;
+  --round:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic UI","Meiryo","PingFang SC","Microsoft YaHei UI",sans-serif;
+  --pop:"Comic Sans MS","Yu Gothic UI","Meiryo","PingFang SC",sans-serif;
+  --ease:cubic-bezier(.34,1.56,.64,1);
+  --shadow-card:0 14px 0 -6px #ffe6f2,0 22px 44px -22px rgba(240,105,168,.45);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;color:var(--ink);font-family:var(--round);font-size:15px;line-height:1.75;
+  background:
+    radial-gradient(900px 460px at 88% -8%,#ffe1f0 0%,transparent 62%),
+    radial-gradient(760px 420px at 4% 8%,#e6f7ff 0%,transparent 60%),
+    radial-gradient(820px 520px at 50% 108%,#e8fbf5 0%,transparent 64%),
+    linear-gradient(180deg,#fff8fc 0%,#fdf4ff 38%,#f4fbf8 100%);
+  background-attachment:fixed;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+::selection{background:#ffd0e6;color:#7a3f61}
+
+/* ---------- 装饰层 ---------- */
+.deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(50px);opacity:.42}
+.blob--1{width:34vw;height:34vw;left:-8vw;top:16vh;background:#ffd9ec}
+.blob--2{width:30vw;height:30vw;right:-6vw;top:6vh;background:#d9efff}
+.blob--3{width:26vw;height:26vw;left:32vw;bottom:-10vh;background:#d9f7ec}
+.petal{
+  position:absolute;top:-8vh;width:16px;height:16px;
+  background:linear-gradient(140deg,#ffd0e6,#ffa8d2);
+  border-radius:52% 4% 52% 4%;
+  opacity:.85;
+  animation:fall linear infinite;
+  box-shadow:0 0 8px rgba(255,168,210,.5);
+}
+@keyframes fall{
+  0%{transform:translate3d(0,-10vh,0) rotate(0deg)}
+  100%{transform:translate3d(6vw,112vh,0) rotate(420deg)}
+}
+.sparkle{position:absolute;color:#ffc2e0;font-size:18px;animation:twinkle 3.4s ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+
+/* ---------- 布局 ---------- */
+.wrap{position:relative;z-index:2;max-width:1140px;margin:0 auto;padding:0 22px 70px}
+
+/* ---------- 顶栏 ---------- */
+.nav{
+  position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;justify-content:space-between;
+  padding:12px 22px;margin:0 -22px 8px;
+  background:linear-gradient(180deg,rgba(255,248,252,.94),rgba(255,248,252,.68) 70%,rgba(255,248,252,0));
+  backdrop-filter:blur(10px);
+}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-avatar{
+  width:42px;height:42px;border-radius:16px;display:grid;place-items:center;flex:none;
+  background:linear-gradient(160deg,#fff,#ffe8f3);
+  border:2px solid #ffd0e6;box-shadow:0 4px 0 #ffe0ee;
+}
+.brand-avatar svg{width:28px;height:28px}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand-name{font-family:var(--pop);font-weight:800;font-size:17px;letter-spacing:.02em;color:#5b4568;white-space:nowrap}
+.brand-name b{color:var(--pink-deep)}
+.brand-sub{font-size:10.5px;color:var(--ink-faint);letter-spacing:.16em;white-space:nowrap}
+
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{
+  padding:7px 14px;border-radius:999px;border:2px solid transparent;
+  font-family:var(--pop);font-weight:700;font-size:13px;color:#8b7a95;transition:.22s var(--ease);
+}
+.nav-link:hover{color:var(--pink-deep);background:#fff;border-color:#ffe3f0;transform:translateY(-1px)}
+.nav-link.is-on{color:#fff;background:linear-gradient(180deg,#ff9ecd,#ff7ebc);border-color:#ff9ecd;box-shadow:0 4px 0 #f2a3c9}
+
+/* ---------- 主视觉 ---------- */
+.hero{
+  position:relative;margin-top:14px;padding:38px 40px 34px;border-radius:36px;
+  background:linear-gradient(150deg,#fffdfe,#fff4fa 52%,#f7f2ff);
+  border:3px solid #ffe0ee;box-shadow:var(--shadow-card);
+  display:grid;grid-template-columns:1.25fr .75fr;gap:20px;align-items:center;overflow:hidden;
+}
+.hero::after{
+  content:"";position:absolute;right:-60px;bottom:-90px;width:260px;height:260px;border-radius:50%;z-index:0;
+  background:radial-gradient(circle at 40% 40%,#ffe1f0,#ffd0e6 60%,transparent 72%);opacity:.55;
+}
+.hero > *{position:relative;z-index:1}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:8px;padding:5px 13px;border-radius:999px;
+  background:#fff;border:2px dashed #ffc2e0;color:#e0699f;
+  font-family:var(--pop);font-weight:700;font-size:11.5px;letter-spacing:.04em;
+}
+.hero-tag i{width:7px;height:7px;border-radius:50%;background:#7ed9a9;box-shadow:0 0 0 3px rgba(126,217,169,.25);animation:breath 2.4s ease-in-out infinite}
+@keyframes breath{50%{transform:scale(.7);opacity:.6}}
+.hero h1{
+  margin:14px 0 10px;font-family:var(--pop);font-weight:800;font-size:clamp(30px,4.6vw,46px);line-height:1.22;letter-spacing:.01em;
+  color:#4d3b57;
+}
+.hero h1 .hl{
+  position:relative;display:inline-block;padding:0 6px;color:#e2598f;
+  background-image:linear-gradient(0deg,#ffe1f0,#ffe1f0);
+  background-repeat:no-repeat;background-size:100% 34%;background-position:0 92%;
+  border-radius:6px;
+}
+.hero-lead{margin:0;color:#7e6d89;font-size:14.5px;max-width:44ch}
+.hero-lead b{color:#e2598f}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:0;
+  font-family:var(--pop);font-weight:800;font-size:14px;letter-spacing:.02em;
+  transition:transform .2s var(--ease),box-shadow .2s,filter .2s;
+}
+.btn--pink{
+  color:#fff;background:linear-gradient(180deg,#ffa1cf,#ff7cbb);
+  box-shadow:0 5px 0 #ef7bb0,0 14px 26px -14px rgba(240,105,168,.9);
+}
+.btn--pink:hover{transform:translateY(-2px);box-shadow:0 7px 0 #ef7bb0,0 18px 30px -14px rgba(240,105,168,.9);filter:saturate(1.08)}
+.btn--ghost{
+  color:#8b6b86;background:#fff;border:2px solid #ffd9ea;box-shadow:0 4px 0 #ffe6f2;
+}
+.btn--ghost:hover{transform:translateY(-2px);color:var(--pink-deep);border-color:#ffc2e0}
+.btn--mint{
+  color:#1d6f5b;background:linear-gradient(180deg,#a9f0da,#7fe0c4);box-shadow:0 5px 0 #6cd0b4,0 14px 24px -16px rgba(45,150,120,.8);
+}
+.btn--mint:hover{transform:translateY(-2px)}
+
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.stat{
+  display:inline-flex;align-items:baseline;gap:6px;padding:6px 13px;border-radius:14px;
+  background:#fff;border:2px solid #fff0f7;box-shadow:0 3px 0 #ffeaf4;
+  font-size:11.5px;color:var(--ink-faint);
+}
+.stat b{font-family:var(--pop);font-size:15px;color:#e2598f;font-weight:800}
+.stat--mint b{color:#3fae92}
+.stat--lav b{color:#8a79e8}
+
+/* 吉祥物 */
+.mascot{position:relative;display:grid;place-items:center;justify-self:center;z-index:1}
+.mascot svg{width:min(260px,38vw);height:auto;filter:drop-shadow(0 16px 22px rgba(240,105,168,.22));animation:bob 3.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-9px) rotate(1.2deg)}}
+.mascot-bubble{
+  position:absolute;top:-6px;right:-16px;padding:8px 14px;border-radius:18px 18px 18px 4px;
+  background:#fff;border:2px solid #ffd9ea;box-shadow:0 4px 0 #ffe6f2;
+  font-family:var(--pop);font-weight:800;font-size:12px;color:#e2598f;white-space:nowrap;
+  transform:rotate(4deg);
+}
+
+/* ---------- 工具条：搜索 + 分类 ---------- */
+.toolbar{margin-top:34px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.search{
+  position:relative;flex:1 1 280px;max-width:420px;
+}
+.search input{
+  width:100%;padding:13px 18px 13px 44px;border-radius:999px;border:2px solid #ffe3f0;background:#fff;
+  font-family:var(--round);font-size:14px;color:var(--ink);outline:none;
+  box-shadow:0 4px 0 #ffeaf4;transition:.22s;
+}
+.search input::placeholder{color:#c9b9d1}
+.search input::-webkit-search-cancel-button{display:none}
+.search input:focus{border-color:#ffb3d9;box-shadow:0 4px 0 #ffd9ec,0 0 0 4px rgba(255,179,217,.22)}
+.search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:#e08cb4;fill:none;stroke-width:2}
+.search-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;
+  border:0;background:#ffe6f2;color:#d17fa8;font-size:13px;line-height:1;display:none;place-items:center;
+}
+.search.is-filled .search-clear{display:grid}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tab{
+  padding:8px 15px;border-radius:999px;border:2px solid #ffe3f0;background:#fff;color:#8b7a95;
+  font-family:var(--pop);font-weight:700;font-size:12.5px;transition:.2s var(--ease);
+  box-shadow:0 3px 0 #ffeef6;
+}
+.tab:hover{transform:translateY(-2px);color:var(--pink-deep);border-color:#ffcbe4}
+.tab.is-on{
+  color:#fff;background:linear-gradient(180deg,#b6a6ff,#9a86ff);border-color:#b6a6ff;
+  box-shadow:0 3px 0 #8e7bf0;
+}
+.tab .tab-count{
+  display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.35);
+  font-size:10.5px;
+}
+.tab.is-on .tab-count{background:rgba(255,255,255,.42)}
+
+/* ---------- 区块标题 ---------- */
+.section{margin-top:38px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.section-head h2{margin:0;font-family:var(--pop);font-weight:800;font-size:20px;color:#54445e}
+.section-head .jp{font-size:11px;color:var(--ink-faint);letter-spacing:.1em;padding-bottom:2px}
+.section-head .rule{flex:1;height:2px;border-radius:2px;background:repeating-linear-gradient(90deg,#ffd9ec 0 8px,transparent 8px 16px)}
+.section-note{font-size:11.5px;color:var(--ink-faint)}
+
+/* ---------- 内容卡片 ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(266px,1fr));gap:20px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;border-radius:var(--radius);
+  background:#fff;border:3px solid #fff0f7;box-shadow:var(--shadow-card);
+  transition:transform .28s var(--ease),box-shadow .28s,border-color .28s;
+  overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(240px 120px at 12% 0%,var(--tint,#fff0f7),transparent 72%);opacity:.9;
+}
+.card:hover{transform:translateY(-7px) rotate(-.7deg);border-color:#ffd9ec;box-shadow:0 18px 0 -6px #ffe0ee,0 30px 50px -24px rgba(240,105,168,.55)}
+.card-emoji{
+  position:relative;width:52px;height:52px;border-radius:18px;display:grid;place-items:center;font-size:26px;
+  background:var(--tint,#fff0f7);border:2px solid #fff;box-shadow:0 4px 0 rgba(255,255,255,.9) inset,0 6px 14px -8px rgba(160,120,150,.5);
+}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.card-tag{
+  padding:3px 10px;border-radius:999px;font-family:var(--pop);font-weight:700;font-size:10.5px;letter-spacing:.02em;
+  background:var(--tint,#fff0f7);color:#a2678f;border:2px solid #fff;
+}
+.card h3{margin:2px 0 0;font-family:var(--pop);font-weight:800;font-size:18px;color:#4d3b57;line-height:1.35}
+.card .en{font-size:10.5px;letter-spacing:.14em;color:var(--ink-faint);text-transform:uppercase;margin-top:-4px}
+.card p{margin:2px 0 0;font-size:13px;color:#7b6a86;line-height:1.72}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;padding-top:12px;padding-right:40px}
+.card-go{
+  display:inline-flex;align-items:center;gap:6px;font-family:var(--pop);font-weight:800;font-size:13px;color:var(--pink-deep);
+  transition:gap .2s var(--ease);
+}
+.card:hover .card-go{gap:11px}
+.card-go svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.card-date{font-size:10.5px;color:var(--ink-faint);letter-spacing:.06em}
+
+.fav{
+  position:absolute;right:14px;bottom:14px;width:30px;height:30px;border-radius:50%;border:2px solid #ffe3f0;background:#fff;
+  display:grid;place-items:center;transition:.2s var(--ease);z-index:2;
+}
+.fav svg{width:15px;height:15px;stroke:#f0a8c6;fill:none;stroke-width:2}
+.fav:hover{transform:scale(1.12);border-color:#ffc2e0}
+.fav[aria-pressed="true"]{background:#fff0f7;border-color:#ffb3d9}
+.fav[aria-pressed="true"] svg{fill:#ff7cbb;stroke:#ff7cbb}
+.fav[aria-pressed="true"]{animation:pop .4s var(--ease)}
+@keyframes pop{40%{transform:scale(1.28)}}
+
+/* 角标贴纸（贴在卡片右上角，卡片顶部留出一条空带） */
+.card.has-badge{padding-top:38px}
+.sticker{
+  position:absolute;top:9px;right:-30px;transform:rotate(22deg);z-index:2;
+  padding:4px 34px;font-family:var(--pop);font-weight:800;font-size:10px;letter-spacing:.14em;color:#fff;
+  background:linear-gradient(180deg,#ffa1cf,#ff6fb0);
+  box-shadow:0 3px 8px -2px rgba(239,123,176,.55),inset 0 1px 0 rgba(255,255,255,.5);
+  border-top:1px solid rgba(255,255,255,.6);border-bottom:1px solid rgba(255,255,255,.35);
+}
+.sticker--mint{background:linear-gradient(180deg,#9aecd2,#5fd6b4)}
+.sticker--lav{background:linear-gradient(180deg,#c3b4ff,#9d89ff)}
+.sticker--lemon{background:linear-gradient(180deg,#ffe89b,#ffd75e);color:#8a6a1f}
+
+/* 准备中 */
+.card--soon{background:linear-gradient(160deg,#fffdfe,#fbf8ff)}
+.card--soon .card-emoji{filter:grayscale(.35);opacity:.85}
+.card--soon .card-go{color:#b9a6c6}
+.card--soon:hover{transform:translateY(-4px) rotate(0)}
+.ribbon-soon{
+  font-family:var(--pop);font-weight:800;font-size:10px;letter-spacing:.1em;color:#9a86c0;
+  padding:2px 9px;border-radius:999px;background:#f4efff;border:2px dashed #d8ccff;
+}
+
+.empty{
+  grid-column:1/-1;text-align:center;padding:44px 22px;border-radius:var(--radius);
+  background:#fff;border:3px dashed #ffe3f0;color:var(--ink-faint);font-size:13.5px;
+}
+.empty span{display:block;font-size:30px;margin-bottom:8px}
+.empty b{color:#e2598f;font-family:var(--pop)}
+
+/* ---------- 便签 / 公告 ---------- */
+.notes{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;margin-top:22px}
+.note{
+  position:relative;padding:24px 24px 22px;border-radius:24px;font-size:13px;line-height:1.85;color:#7a6a83;
+}
+.note--pink{background:#fff6fa;border:3px solid #ffe3f0;box-shadow:0 12px 0 -6px #ffeaf4}
+.note--mint{background:#f4fdf9;border:3px solid #d6f4e9;box-shadow:0 12px 0 -6px #e2f8f0}
+.note::before{
+  content:"";position:absolute;top:-9px;left:22px;width:56px;height:18px;border-radius:3px;
+  background:repeating-linear-gradient(135deg,#ffd9ec 0 6px,#ffe6f2 6px 12px);opacity:.9;transform:rotate(-3deg);
+}
+.note--mint::before{background:repeating-linear-gradient(135deg,#bdeedd 0 6px,#d6f4e9 6px 12px)}
+.note h3{margin:0 0 8px;font-family:var(--pop);font-weight:800;font-size:15px;color:#5b4568;display:flex;align-items:center;gap:8px}
+.note ul{margin:0;padding-left:18px}
+.note li{margin:3px 0}
+.note code{
+  font-family:"Cascadia Mono","Consolas",monospace;font-size:12px;background:#fff;border:1px solid #ffe3f0;
+  border-radius:6px;padding:1px 6px;color:#c4538b;
+}
+
+/* ---------- 关于 ---------- */
+.about{
+  margin-top:38px;padding:30px 32px;border-radius:32px;text-align:center;
+  background:linear-gradient(160deg,#fffdfe,#fff6fb);border:3px solid #ffe9f2;box-shadow:0 14px 0 -6px #ffeaf4;
+}
+.about h2{margin:0 0 10px;font-family:var(--pop);font-weight:800;font-size:19px;color:#54445e}
+.about p{margin:0 auto;max-width:60ch;font-size:13px;color:#8b7a95;line-height:1.9}
+.about .kana{display:block;margin-top:14px;font-size:11px;letter-spacing:.32em;color:#d7b8cf}
+
+/* ---------- 页脚 ---------- */
+.foot{
+  margin-top:44px;padding-top:18px;border-top:2px dashed #ffe3f0;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  font-size:11px;color:#bda8c6;letter-spacing:.04em;
+}
+.foot-heart{color:#ff9ecd;animation:beat 1.8s ease-in-out infinite;display:inline-block}
+@keyframes beat{0%,100%{transform:scale(1)}18%{transform:scale(1.22)}36%{transform:scale(1)}54%{transform:scale(1.14)}}
+
+/* ---------- toast ---------- */
+.toast{
+  position:fixed;left:50%;bottom:30px;z-index:90;transform:translate(-50%,22px);opacity:0;pointer-events:none;
+  padding:12px 22px;border-radius:999px;background:#fff;border:3px solid #ffd9ec;
+  box-shadow:0 10px 0 -4px #ffe6f2,0 18px 30px -18px rgba(240,105,168,.7);
+  font-family:var(--pop);font-weight:800;font-size:13px;color:#e2598f;
+  transition:transform .3s var(--ease),opacity .3s;
+}
+.toast[data-show="true"]{transform:translate(-50%,0);opacity:1}
+
+/* ---------- 入场 ---------- */
+.js .reveal{opacity:0;transform:translateY(18px) scale(.985)}
+.reveal.is-in{opacity:1;transform:none;transition:opacity .62s var(--ease),transform .62s var(--ease)}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:880px){
+  .hero{grid-template-columns:1fr;padding:30px 24px 26px;border-radius:30px}
+  .mascot{order:-1;justify-self:start;margin-bottom:8px}
+  .mascot svg{width:150px}
+  .mascot-bubble{right:auto;left:118px;top:4px}
+  .notes{grid-template-columns:1fr}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px 56px}
+  .nav{padding:10px 14px;margin:0 -14px 4px;gap:8px}
+  .brand-sub{display:none}
+  .nav-links{gap:2px}
+  .nav-link{padding:6px 10px;font-size:12px}
+  .hero h1{font-size:clamp(26px,8vw,34px)}
+  .hero-lead{font-size:13.5px}
+  .toolbar{gap:10px}
+  .search{max-width:none}
+  .tabs{gap:6px}
+  .tab{padding:7px 12px;font-size:12px}
+  .grid{grid-template-columns:1fr;gap:16px}
+  .section-head h2{font-size:17px}
+  .about{padding:24px 18px}
+  .foot{flex-direction:column;align-items:flex-start;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  .petal{display:none}
+}
+</style>
 </head>
 <body>
-  <div class="ambient" aria-hidden="true">
-    <div class="ambient-orb ambient-orb--cyan"></div>
-    <div class="ambient-orb ambient-orb--amber"></div>
-    <div class="ambient-grid"></div>
-  </div>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="vignette" aria-hidden="true"></div>
 
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="DJI Air 3S 拆解实验室首页">
-      <span class="brand-mark" aria-hidden="true">
-        <i></i><i></i><i></i><i></i>
+<!-- 背景装饰：光斑 / 花瓣 / 小星星 -->
+<div class="deco" aria-hidden="true">
+  <span class="blob blob--1"></span>
+  <span class="blob blob--2"></span>
+  <span class="blob blob--3"></span>
+  <span class="sparkle" style="left:8%;top:22%">✧</span>
+  <span class="sparkle" style="left:26%;top:64%;animation-delay:.8s">✦</span>
+  <span class="sparkle" style="left:73%;top:14%;animation-delay:1.6s">✧</span>
+  <span class="sparkle" style="left:88%;top:56%;animation-delay:2.2s">✦</span>
+  <span class="sparkle" style="left:48%;top:82%;animation-delay:1.1s">✧</span>
+</div>
+
+<div class="wrap">
+
+  <!-- ================= 顶栏 ================= -->
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="回到顶部">
+      <span class="brand-avatar" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="23" r="11" fill="#ffd0e6"/><path d="M11 13l3 9-8-5z" fill="#ffb3d9"/><path d="M29 13l-3 9 8-5z" fill="#ffb3d9"/><circle cx="16" cy="23" r="1.8" fill="#5b4a63"/><circle cx="24" cy="23" r="1.8" fill="#5b4a63"/><path d="M17.5 28q2.5 2 5 0" stroke="#5b4a63" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="12.5" cy="26" r="2" fill="#ff9ecb" opacity=".65"/><circle cx="27.5" cy="26" r="2" fill="#ff9ecb" opacity=".65"/></svg>
       </span>
-      <span class="brand-copy">
-        <span class="brand-kicker">DJI AIR SERIES <b>/</b> STRUCTURE LAB</span>
-        <span class="brand-title">AIR 3S <em>拆解实验室</em></span>
+      <span class="brand-text">
+        <span class="brand-name">宁芙<b>小站</b></span>
+        <span class="brand-sub">NINGFU 334 · 导航页</span>
       </span>
     </a>
-
-    <div class="topbar-actions">
-      <div class="system-readout">
-        <span class="signal-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span>交互模型已就绪</span>
-        <b>R160</b>
-      </div>
-      <div class="top-spec"><span>起飞重量</span><b>724<small>g</small></b></div>
-      <div class="top-spec"><span>最长飞行</span><b>45<small>min</small></b></div>
-      <button class="icon-button mobile-only" id="inventoryToggle" type="button" aria-label="打开部件清单" aria-expanded="false">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg>
-      </button>
-    </div>
+    <nav class="nav-links" aria-label="页面导航">
+      <a class="nav-link is-on" href="#contents">全部内容</a>
+      <a class="nav-link" href="#notice">小公告</a>
+      <a class="nav-link" href="#about">关于</a>
+    </nav>
   </header>
 
-  <main class="viewport" id="viewport">
-    <div class="canvas-host" id="canvasHost" aria-label="DJI Air 3S 可交互三维模型"></div>
-    <svg class="leader-layer" id="leaderLayer" aria-hidden="true"></svg>
-    <div class="label-layer" id="labelLayer" aria-live="polite"></div>
-
-    <div class="reticle" id="reticle" aria-hidden="true">
-      <span class="reticle__ring"></span>
-      <span class="reticle__ring reticle__ring--inner"></span>
-      <i class="reticle__corner reticle__corner--tl"></i>
-      <i class="reticle__corner reticle__corner--tr"></i>
-      <i class="reticle__corner reticle__corner--bl"></i>
-      <i class="reticle__corner reticle__corner--br"></i>
-      <span class="reticle__core"></span>
-    </div>
-
-    <div class="hover-tag" id="hoverTag" aria-hidden="true">
-      <span class="hover-tag__dot"></span>
-      <span id="hoverTagName">部件</span>
-      <small>点击拆解</small>
-    </div>
-
-    <div class="viewfinder" aria-hidden="true">
-      <div class="vf-corner vf-corner--tl"></div>
-      <div class="vf-corner vf-corner--tr"></div>
-      <div class="vf-corner vf-corner--bl"></div>
-      <div class="vf-corner vf-corner--br"></div>
-      <div class="vf-axis vf-axis--x"></div>
-      <div class="vf-axis vf-axis--y"></div>
-      <div class="vf-center"><i></i></div>
-      <span class="vf-label vf-label--top">AIRFRAME SCAN / 01</span>
-      <span class="vf-label vf-label--bottom">ORBIT CAMERA · LIVE</span>
-      <span class="vf-tick vf-tick--left"></span>
-      <span class="vf-tick vf-tick--right"></span>
-    </div>
-
-    <div class="scene-caption">
-      <span class="scene-caption__line"></span>
-      <div>
-        <b>DJI AIR 3S</b>
-        <span>双摄旗舰 · 全向感知 · 45 分钟续航</span>
+  <!-- ================= 主视觉 ================= -->
+  <section class="hero reveal" id="top">
+    <div>
+      <span class="hero-tag"><i></i> 欢迎回来！おかえりなさい</span>
+      <h1>今天想看点<span class="hl">什么</span>呢？</h1>
+      <p class="hero-lead">
+        这里是我的小站总入口 ♡ 站点里陆续会放进越来越多的东西：
+        <b>3D 模型</b>、<b>小工具</b>、<b>图片</b>、<b>小游戏</b>……
+        想找什么，点下面的卡片就好啦。
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn--pink" href="#contents">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          全部内容
+        </a>
+        <button class="btn btn--mint" id="randomBtn" type="button">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="9" cy="9" r="1.3" fill="currentColor"/><circle cx="15" cy="15" r="1.3" fill="currentColor"/><circle cx="15" cy="9" r="1.3" fill="currentColor"/><circle cx="9" cy="15" r="1.3" fill="currentColor"/></svg>
+          随机逛逛
+        </button>
+      </div>
+      <div class="hero-stats">
+        <span class="stat"><b id="statTotal">0</b>个内容</span>
+        <span class="stat stat--mint"><b id="statCats">0</b>个分类</span>
+        <span class="stat stat--lav"><b id="statFav">0</b>个收藏</span>
+        <span class="stat">更新 <b id="statDate">—</b></span>
       </div>
     </div>
 
-    <div class="telemetry" aria-hidden="true">
-      <span>ORBIT <b id="orbitReadout">000°</b></span>
-      <span>DIST <b id="zoomReadout">9.6</b></span>
-      <span>SEPARATION <b id="separationReadout">0%</b></span>
-    </div>
-  </main>
-
-  <aside class="glass-panel inventory-panel" id="inventoryPanel" aria-label="部件清单">
-    <div class="panel-micro">
-      <span>SYS / COMPONENTS</span>
-      <span>BAY 01—09</span>
-    </div>
-    <div class="panel-heading">
-      <div>
-        <span class="eyebrow">EXPLODED VIEW</span>
-        <h2>部件清单</h2>
-      </div>
-      <span class="count-chip"><b>09</b> 模块</span>
-    </div>
-
-    <div class="separation-meter">
-      <div class="progress-ring" id="progressRing" style="--progress:0">
-        <div class="progress-ring__inner">
-          <b id="progressValue">0</b><small>%</small>
-        </div>
-      </div>
-      <div class="separation-copy">
-        <span>结构分离度</span>
-        <b id="separationLabel">整机状态 / ASSEMBLED</b>
-        <small>点击部件，逐层拆解内部结构</small>
-      </div>
-    </div>
-
-    <div class="component-list" id="componentList" role="list"></div>
-
-    <div class="panel-footnote">
-      <span class="footnote-icon">i</span>
-      <p>点击任意部件或直接点击模型，查看结构参数与拆解动画。</p>
-    </div>
-    <button class="icon-button panel-close mobile-only" id="inventoryClose" type="button" aria-label="关闭部件清单">×</button>
-  </aside>
-
-  <aside class="glass-panel detail-panel" id="detailPanel" aria-label="部件详情">
-    <div class="detail-topline">
-      <span id="detailIndex">TOTAL / OVERVIEW</span>
-      <button class="icon-button" id="detailClose" type="button" aria-label="返回整机概览">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
-    </div>
-    <div class="detail-content" id="detailContent"></div>
-    <div class="detail-scanline" aria-hidden="true"></div>
-  </aside>
-
-  <section class="gesture-guide" aria-label="操作指引">
-    <div class="gesture-guide__title">
-      <span class="status-dot"></span>
-      操作指引 <small>CONTROLS</small>
-    </div>
-    <div class="gesture-guide__row">
-      <span class="gesture">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11V6.5a1.5 1.5 0 013 0V11m0-2.5a1.5 1.5 0 013 0V11m0-1.5a1.5 1.5 0 013 0v5A5.5 5.5 0 0112.5 20h-1a5.5 5.5 0 01-4.6-2.5L4 13.2a1.5 1.5 0 012.4-1.8L9 14"/></svg>
-        拖拽旋转
-      </span>
-      <span class="gesture">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V7a1 1 0 012 0v4m0-3a1 1 0 012 0v3m0-2a1 1 0 012 0v2m-6 2l-2-2a1 1 0 00-1.4 1.4l3 4.2A5 5 0 0012 20h1a5 5 0 005-5v-2"/></svg>
-        滚轮缩放
-      </span>
-      <span class="gesture">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
-        点击拆解
-      </span>
+    <div class="mascot" aria-hidden="true">
+      <svg viewBox="0 0 220 200">
+        <ellipse cx="110" cy="182" rx="66" ry="9" fill="#ffd9ec" opacity=".55"/>
+        <path d="M52 62l10 44-38-26z" fill="#ffc2e0" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M168 62l-10 44 38-26z" fill="#ffc2e0" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M60 70l6 28-24-17z" fill="#ff9ecb"/>
+        <path d="M160 70l-6 28 24-17z" fill="#ff9ecb"/>
+        <circle cx="110" cy="112" r="62" fill="#fff4fa" stroke="#ffe0ee" stroke-width="5"/>
+        <circle cx="110" cy="112" r="52" fill="#ffe9f4"/>
+        <path d="M78 110q10-12 20 0" stroke="#5b4a63" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M122 110q10-12 20 0" stroke="#5b4a63" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <circle cx="76" cy="128" r="6" fill="#ffa8cf" opacity=".65"/>
+        <circle cx="144" cy="128" r="6" fill="#ffa8cf" opacity=".65"/>
+        <path d="M104 130q6 6 12 0" stroke="#5b4a63" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+        <path d="M110 138v6" stroke="#ffb3d9" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="110" cy="150" r="4" fill="#ffe27a" stroke="#fff" stroke-width="2"/>
+        <path d="M132 62q10-10 22 2" stroke="#ffd0e6" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M92 56q-12-6-18 6" stroke="#ffd0e6" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M74 96l-14-4M146 96l14-4" stroke="#ffc2e0" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span class="mascot-bubble">にゃ〜 ♪</span>
     </div>
   </section>
 
-  <div class="control-dock" role="toolbar" aria-label="三维模型控制">
-    <button class="dock-button dock-button--primary" id="explodeAllBtn" type="button">
-      <span class="dock-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/><path d="M9.5 9.5L5.5 5.5m13 0l-4 4m0 9l4 4m-13 0l4-4"/></svg>
-      </span>
-      <span class="dock-copy"><b>全部拆解</b><small>EXPLODE ALL</small></span>
-      <span class="dock-key">SPACE</span>
-    </button>
-    <span class="dock-separator" aria-hidden="true"></span>
-    <button class="dock-button" id="resetBtn" type="button">
-      <span class="dock-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11a8 8 0 111.9 6.1"/><path d="M4 5v6h6"/></svg>
-      </span>
-      <span class="dock-copy"><b>一键复位</b><small>REASSEMBLE</small></span>
-    </button>
-    <button class="dock-button is-active" id="autoRotateBtn" type="button" aria-pressed="true">
-      <span class="dock-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 10-2 5"/></svg>
-      </span>
-      <span class="dock-copy"><b>自动旋转</b><small>AUTO ORBIT</small></span>
-      <span class="status-led" aria-hidden="true"></span>
-    </button>
-    <button class="dock-button" id="viewResetBtn" type="button">
-      <span class="dock-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><circle cx="12" cy="12" r="2.5"/></svg>
-      </span>
-      <span class="dock-copy"><b>重置视角</b><small>RESET CAMERA</small></span>
-    </button>
-  </div>
-
-  <div class="touch-hint" aria-hidden="true">
-    <span></span>拖拽旋转 · 双指缩放 · 点击部件拆解
-  </div>
-
-  <footer class="statusbar" aria-hidden="true">
-    <span>THREE.JS PROCEDURAL GEOMETRY</span>
-    <span class="statusbar__center"><i></i> ALL SYSTEMS NOMINAL</span>
-    <span>© 2026 AIR 3S TEARDOWN LAB</span>
-  </footer>
-
-  <div class="intro" id="intro" aria-label="加载中">
-    <div class="intro-grid" aria-hidden="true"></div>
-    <div class="intro-core">
-      <div class="intro-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-      <span class="intro-kicker">DJI AIR SERIES <b>/</b> STRUCTURE LAB</span>
-      <h1>AIR 3S</h1>
-      <p>INTERACTIVE EXPLODED VIEW</p>
-      <div class="intro-track"><span id="introBar"></span></div>
-      <div class="intro-meta"><span id="introStatus">正在生成程序化结构</span><b id="introPercent">00</b></div>
+  <!-- ================= 工具条 ================= -->
+  <div class="toolbar reveal">
+    <div class="search" id="searchBox">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+      <input id="searchInput" type="search" placeholder="找点什么？输入名字 / 分类试试～" aria-label="搜索内容" autocomplete="off" />
+      <button class="search-clear" id="searchClear" type="button" aria-label="清空搜索">×</button>
     </div>
-    <div class="intro-corner intro-corner--tl"></div>
-    <div class="intro-corner intro-corner--tr"></div>
-    <div class="intro-corner intro-corner--bl"></div>
-    <div class="intro-corner intro-corner--br"></div>
+    <div class="tabs" id="tabs" role="group" aria-label="按分类筛选"></div>
   </div>
 
-  <noscript>
-    <div class="noscript">请启用 JavaScript 以查看 DJI Air 3S 三维拆解实验室。</div>
-  </noscript>
+  <!-- ================= 内容列表 ================= -->
+  <section class="section" id="contents">
+    <div class="section-head">
+      <h2>内容一览</h2>
+      <span class="jp">ないよう いちらん</span>
+      <span class="rule"></span>
+      <span class="section-note" id="resultNote">共 0 个</span>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
 
-  <script src="./vendor/three.min.js"></script>
-  <script src="./app.js"></script>
+  <!-- ================= 公告 / 说明 ================= -->
+  <section class="section reveal" id="notice">
+    <div class="section-head">
+      <h2>小公告</h2>
+      <span class="jp">おしらせ</span>
+      <span class="rule"></span>
+    </div>
+    <div class="notes">
+      <div class="note note--pink">
+        <h3>🌸 最近在做什么</h3>
+        <ul>
+          <li>3D 拆解实验室已经上线，可以拖拽旋转、逐层拆开看结构。</li>
+          <li>接下来会放更多小东西进来，做完了会在这里说一声。</li>
+          <li>页面有收藏功能：卡片右下角的 ♡ 点亮，下次点「我的收藏」就能找到。</li>
+        </ul>
+      </div>
+      <div class="note note--mint">
+        <h3>🛠 站长自己看</h3>
+        <ul>
+          <li>加新内容 → 打开 <code>index.html</code>，在 <code>SITES</code> 里加一项即可。</li>
+          <li><code>ready:false</code> 会显示成「准备中」，点开提示敬请期待。</li>
+          <li>分类用 <code>tag</code> 字段，新分类会自动出现在上面的筛选条里。</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 关于 ================= -->
+  <section class="about reveal" id="about">
+    <h2>关于这个小站 ♡</h2>
+    <p>
+      一个用来放各种小玩意的地方。导航页只做一件事：让你一眼看到有什么、点一下就进去。
+      内容会慢慢变多，所以这里会一直保持「列表 + 分类 + 搜索」的样子，不会让你迷路。
+    </p>
+    <span class="kana">ありがとう またきてね</span>
+  </section>
+
+  <footer class="foot">
+    <span>© 2026 宁芙小站 · 导航页</span>
+    <span>由 <span class="foot-heart">♥</span> 手工制作 · 本站持续更新中</span>
+    <span>llla.ningfu334.workers.dev</span>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  document.documentElement.classList.add("js");
+  // 万一脚本出错，别让入场动画把内容锁成透明
+  window.addEventListener("error", function () { document.documentElement.classList.remove("js"); });
+
+  /* =========================================================
+     ★★★ 内容清单 ★★★
+     以后加新东西，只需要往下面 SITES 数组里加一段：
+       { id:"唯一英文id", title:"显示名", sub:"英文小字", desc:"一句话介绍",
+         url:"https://...", tag:"分类", emoji:"🍰", date:"2026.11.05",
+         badge:"NEW", ready:true }
+     · ready:false → 显示「准备中」，点击只弹提示
+     · badge 可省略；badge:"NEW" 会在卡片角上贴一张小贴纸
+     · url 用 "#" 开头的会当站内锚点，其余在新标签打开
+     ========================================================= */
+  var SITES = [
+    {
+      id: "air3s",
+      title: "AIR 3S 拆解实验室",
+      sub: "DJI AIR 3S · TEARDOWN LAB",
+      desc: "无人机三维模型，拖拽旋转、逐层拆开九个结构模块，云台、电池、图传核心都能单独看。",
+      url: "https://llla.ningfu334.workers.dev/",
+      tag: "3D 实验室",
+      emoji: "🚁",
+      date: "2026.11.03",
+      badge: "NEW",
+      ready: true
+    },
+    {
+      id: "tools",
+      title: "小工具箱",
+      sub: "MINI TOOLS",
+      desc: "图片压缩、二维码生成、单位换算……日常用得到的小东西，全都塞进一个页面。",
+      url: "#",
+      tag: "小工具",
+      emoji: "🧰",
+      date: "准备中",
+      ready: false
+    },
+    {
+      id: "gallery",
+      title: "图片收藏馆",
+      sub: "PICTURE GALLERY",
+      desc: "随手拍的、画过的、觉得好看的图，按主题分好类，点开可以看大图。",
+      url: "#",
+      tag: "图片",
+      emoji: "🖼️",
+      date: "准备中",
+      ready: false
+    },
+    {
+      id: "games",
+      title: "游戏角落",
+      sub: "MINI GAMES",
+      desc: "几个能在地铁上玩的小游戏，打开就能玩，不需要下载任何东西。",
+      url: "#",
+      tag: "游戏",
+      emoji: "🎮",
+      date: "准备中",
+      ready: false
+    },
+    {
+      id: "notes",
+      title: "学习笔记",
+      sub: "NOTES",
+      desc: "折腾过程中记下来的东西，代码片段、踩过的坑、用得上的配置。",
+      url: "#",
+      tag: "笔记",
+      emoji: "📒",
+      date: "准备中",
+      ready: false
+    },
+    {
+      id: "about-me",
+      title: "关于我",
+      sub: "PROFILE",
+      desc: "我是谁、在做什么、怎么联系我，还有这个站是怎么搭起来的。",
+      url: "#",
+      tag: "杂项",
+      emoji: "🍰",
+      date: "准备中",
+      ready: false
+    }
+  ];
+
+  /* 分类小标签的配色（按 tag 名字自动分配，新分类也会自动有颜色） */
+  var TINTS = ["#fff0f7", "#eaf5ff", "#e8fbf5", "#f1edff", "#fff8dd", "#ffeef0", "#eef7ff"];
+
+  function tintFor(tag) {
+    if (tag === "我的收藏") return "#ffe9f4";
+    var sum = 0;
+    for (var i = 0; i < tag.length; i++) sum += tag.charCodeAt(i);
+    return TINTS[sum % TINTS.length];
+  }
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var grid = $("#grid");
+  var tabsEl = $("#tabs");
+  var searchBox = $("#searchBox");
+  var searchInput = $("#searchInput");
+  var toastEl = $("#toast");
+  var FAV_KEY = "ningfu-nav-favorites";
+
+  var state = { tag: "全部", query: "" };
+  var favs = loadFavs();
+
+  /* ---------- 收藏（localStorage） ---------- */
+  function loadFavs() {
+    try {
+      var raw = localStorage.getItem(FAV_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+  function saveFavs() {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) {}
+  }
+
+  /* ---------- 提示 ---------- */
+  var toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.dataset.show = "true";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.dataset.show = "false"; }, 2100);
+  }
+
+  /* ---------- 统计 & 分类 ---------- */
+  function categories() {
+    var list = ["全部"];
+    SITES.forEach(function (s) { if (list.indexOf(s.tag) < 0) list.push(s.tag); });
+    if (favs.length) list.push("我的收藏");
+    return list;
+  }
+
+  function renderStats() {
+    var readyCount = SITES.filter(function (s) { return s.ready; }).length;
+    $("#statTotal").textContent = readyCount;
+    $("#statCats").textContent = categories().length - 1;
+    $("#statFav").textContent = favs.length;
+    var dates = SITES.filter(function (s) { return s.ready && /\d{4}\./.test(s.date); })
+      .map(function (s) { return s.date; }).sort();
+    $("#statDate").textContent = dates.length ? dates[dates.length - 1] : "—";
+  }
+
+  function renderTabs() {
+    var list = categories();
+    if (list.indexOf(state.tag) < 0) state.tag = "全部";
+    tabsEl.innerHTML = list.map(function (tag) {
+      var count = tag === "全部"
+        ? SITES.filter(function (s) { return s.ready; }).length
+        : tag === "我的收藏"
+          ? favs.length
+          : SITES.filter(function (s) { return s.tag === tag; }).length;
+      return '<button class="tab' + (state.tag === tag ? " is-on" : "") + '" type="button" data-tag="' + tag +
+        '" aria-pressed="' + (state.tag === tag) + '">' + tag +
+        '<span class="tab-count">' + count + '</span></button>';
+    }).join("");
+  }
+
+  /* ---------- 过滤 ---------- */
+  function matches(site) {
+    if (state.tag === "我的收藏" && favs.indexOf(site.id) < 0) return false;
+    if (state.tag !== "全部" && state.tag !== "我的收藏" && site.tag !== state.tag) return false;
+    if (!state.query) return true;
+    var q = state.query.toLowerCase();
+    return (site.title + site.sub + site.desc + site.tag + site.id).toLowerCase().indexOf(q) >= 0;
+  }
+
+  /* ---------- 渲染卡片 ---------- */
+  function renderGrid() {
+    var list = SITES.filter(matches);
+    // 已上线的排前面
+    list.sort(function (a, b) { return (b.ready ? 1 : 0) - (a.ready ? 1 : 0); });
+
+    if (!list.length) {
+      var soon = SITES.filter(function (s) { return !s.ready; }).length;
+      grid.innerHTML =
+        '<div class="empty"><span>🔍</span>' +
+        (state.tag === "我的收藏"
+          ? '还没有收藏哦～ 点卡片右下角的 <b>♡</b> 就能收藏啦'
+          : '没有找到呢…换个词试试？<br><b>' + soon + '</b> 个内容还在准备中') +
+        '</div>';
+    } else {
+      grid.innerHTML = list.map(cardHTML).join("");
+    }
+
+    $("#resultNote").textContent = "显示 " + list.length + " 个" + (state.query ? " · 关键词「" + state.query + "」" : "");
+    renderStats();
+    renderTabs();
+    observeReveal();
+  }
+
+  function cardHTML(site) {
+    var tint = tintFor(site.tag);
+    var isFav = favs.indexOf(site.id) >= 0;
+    var sticker = "";
+    if (site.badge) {
+      sticker = '<span class="sticker">' + site.badge + '</span>';
+    }
+    var foot = site.ready
+      ? '<span class="card-go">打开看看' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 6l6 6-6 6"/></svg></span>' +
+        '<span class="card-date">' + site.date + '</span>'
+      : '<span class="ribbon-soon">准备中 · まもなく</span>' +
+        '<span class="card-date">' + site.date + '</span>';
+
+    return (
+      '<article class="card ' + (site.ready ? "" : "card--soon") + (site.badge ? " has-badge" : "") +
+        '" style="--tint:' + tint + '" data-id="' + site.id + '" tabindex="0" role="link" aria-label="' + site.title + '">' +
+        sticker +
+        '<div class="card-top">' +
+          '<span class="card-emoji" aria-hidden="true">' + site.emoji + '</span>' +
+          '<span class="card-tag">' + site.tag + '</span>' +
+        '</div>' +
+        '<h3>' + site.title + '</h3>' +
+        '<span class="en">' + site.sub + '</span>' +
+        '<p>' + site.desc + '</p>' +
+        '<div class="card-foot">' + foot + '</div>' +
+        '<button class="fav" type="button" data-fav="' + site.id + '" aria-pressed="' + isFav + '" aria-label="收藏 ' + site.title + '">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.3-7-9.2A4 4 0 0 1 12 8a4 4 0 0 1 7 2.8C19 15.7 12 20 12 20z"/></svg>' +
+        '</button>' +
+      '</article>'
+    );
+  }
+
+  /* ---------- 打开内容 ---------- */
+  function openSite(site) {
+    if (!site) return;
+    if (!site.ready) { toast("还没做好准备呢～ " + site.title + " 马上就来 ♡"); return; }
+    if (site.url.charAt(0) === "#") {
+      var t = document.querySelector(site.url);
+      if (t) t.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    window.open(site.url, "_blank", "noopener");
+  }
+
+  function findSite(id) {
+    for (var i = 0; i < SITES.length; i++) if (SITES[i].id === id) return SITES[i];
+    return null;
+  }
+
+  /* ---------- 事件 ---------- */
+  grid.addEventListener("click", function (e) {
+    var favBtn = e.target.closest("[data-fav]");
+    if (favBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      var id = favBtn.dataset.fav;
+      var idx = favs.indexOf(id);
+      if (idx >= 0) { favs.splice(idx, 1); toast("已取消收藏"); }
+      else { favs.push(id); toast("收藏好啦 ♡"); }
+      saveFavs();
+      favBtn.setAttribute("aria-pressed", String(idx < 0));
+      renderStats();
+      if (state.tag === "我的收藏") renderGrid(); else renderTabs();
+      return;
+    }
+    var card = e.target.closest(".card");
+    if (card) openSite(findSite(card.dataset.id));
+  });
+
+  grid.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var card = e.target.closest(".card");
+    if (!card || e.target.closest("[data-fav]")) return;
+    e.preventDefault();
+    openSite(findSite(card.dataset.id));
+  });
+
+  tabsEl.addEventListener("click", function (e) {
+    var btn = e.target.closest(".tab");
+    if (!btn) return;
+    state.tag = btn.dataset.tag;
+    renderTabs();
+    renderGrid();
+  });
+
+  searchInput.addEventListener("input", function () {
+    state.query = searchInput.value.trim();
+    searchBox.classList.toggle("is-filled", !!state.query);
+    renderGrid();
+  });
+  $("#searchClear").addEventListener("click", function () {
+    searchInput.value = "";
+    state.query = "";
+    searchBox.classList.remove("is-filled");
+    searchInput.focus();
+    renderGrid();
+  });
+
+  $("#randomBtn").addEventListener("click", function () {
+    var pool = SITES.filter(function (s) { return s.ready; });
+    if (!pool.length) { toast("暂时还没有上线的内容哦"); return; }
+    var pick = pool[Math.floor(Math.random() * pool.length)];
+    toast("带你去逛逛「" + pick.title + "」♪");
+    setTimeout(function () { openSite(pick); }, 420);
+  });
+
+  /* ---------- 入场动画 ---------- */
+  var io = null;
+  function observeReveal() {
+    if (!("IntersectionObserver" in window)) {
+      Array.prototype.forEach.call(document.querySelectorAll(".reveal"), function (el) { el.classList.add("is-in"); });
+      return;
+    }
+    if (!io) {
+      io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); }
+        });
+      }, { rootMargin: "0px 0px -6% 0px", threshold: 0.05 });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll(".reveal:not(.is-in)"), function (el) { io.observe(el); });
+  }
+
+  /* ---------- 花瓣 ---------- */
+  (function petals() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var layer = document.querySelector(".deco");
+    for (var i = 0; i < 14; i++) {
+      var p = document.createElement("span");
+      p.className = "petal";
+      var size = 9 + Math.random() * 12;
+      p.style.left = (Math.random() * 100) + "%";
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      p.style.opacity = (0.35 + Math.random() * 0.5).toFixed(2);
+      p.style.animationDuration = (11 + Math.random() * 10).toFixed(1) + "s";
+      p.style.animationDelay = (-Math.random() * 18).toFixed(1) + "s";
+      layer.appendChild(p);
+    }
+  })();
+
+  /* ---------- 启动 ---------- */
+  renderStats();
+  renderTabs();
+  renderGrid();
+  observeReveal();
+})();
+</script>
 </body>
 </html>
