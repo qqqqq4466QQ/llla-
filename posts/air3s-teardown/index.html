@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b1f1c" />
+<meta name="description" content="AIR 3S 拆解实验室里没有一个模型文件：机身、机臂、云台、螺旋桨，全是 Three.js 现场生成的。" />
+<title>用代码堆出来的无人机 · linao的小窝</title>
+<link rel="stylesheet" href="../post.css" />
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="../../">
+      <span class="brand-avatar" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="23" r="11" fill="#a8f0d2"/><path d="M11 13l3 9-8-5z" fill="#d8f7ea"/><path d="M29 13l-3 9 8-5z" fill="#d8f7ea"/><circle cx="16" cy="23" r="1.7" fill="#0b211d"/><circle cx="24" cy="23" r="1.7" fill="#0b211d"/><path d="M17.5 27.5q2.5 2 5 0" stroke="#0b211d" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </span>
+      <span class="brand-name">linao<em>的小窝</em></span>
+    </a>
+    <span class="crumb">/ 博文 / 程序化建模</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深色模式">
+      <svg viewBox="0 0 24 24" aria-hidden="true" id="themeIcon"></svg>
+    </button>
+    <a class="back-pill" href="../">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>
+      全部博文
+    </a>
+  </div>
+</header>
+
+<section class="head">
+  <div class="head-inner">
+    <span class="kicker">技术 · PROCEDURAL 3D</span>
+    <h1>用代码堆出来的无人机</h1>
+    <div class="meta">
+      <span>2026.11.02</span>
+      <span>约 8 分钟</span>
+      <span>标签：Three.js / 几何 / 交互</span>
+    </div>
+  </div>
+</section>
+<div class="wave" aria-hidden="true">
+  <svg viewBox="0 0 1440 72" preserveAspectRatio="none">
+    <path fill="var(--paper)" d="M0,34 C180,66 320,8 500,22 C680,36 780,68 960,56 C1140,44 1280,10 1440,26 L1440,72 L0,72 Z"/>
+  </svg>
+</div>
+
+<main>
+  <article>
+    <p>
+      <a href="../../lab/">拆解实验室</a>里那台无人机，没有 <code>.glb</code>、没有 <code>.obj</code>、也没有贴图文件。
+      它由大约三千行 JavaScript 现场拼出来：每个零件都是几何体，每个动画都是插值。
+      这篇写一下它大概是怎么搭的。
+    </p>
+
+    <h2>为什么不用现成模型</h2>
+    <p>
+      最直接的理由是<strong>没有模型文件</strong>。手头没有官方的三维资产，也不想去扒别人的。
+      另一个理由是：程序化生成的模型天生带参数——想改机臂长度、桨叶半径，改一个数字就行，
+      还能让零件各自独立运动，做「拆开/装回去」这种交互非常顺手。
+    </p>
+
+    <h2>零件清单就是数据</h2>
+    <p>
+      整台机器被切成九个模块，每个模块是一个对象：编号、中文名、英文名、分类、一句话规格、
+      拆解方向、以及详情面板里的那张参数表。
+    </p>
+    <pre><code>{
+  id: "battery",
+  num: "03",
+  name: "智能飞行电池",
+  en: "INTELLIGENT FLIGHT BATTERY",
+  category: "能源系统",
+  labelSpec: "4276 mAh · 45 min",
+  explode: { x: 0, y: 1.58, z: -0.13 },   // 拆解时往哪飘
+  specs: [
+    ["电池容量", "4276 mAh"],
+    ["电池能量", "64.96 Wh"],
+    ["最长飞行时间", "45 分钟"]
+  ]
+}</code></pre>
+    <p>
+      UI 全部由这份数据驱动：左侧清单、场景里的引线标签、右侧详情表、拆解百分比，
+      都是同一个数组渲染出来的。加一个零件，只要在这里加一段，再补上对应的几何体。
+    </p>
+
+    <h2>机身与机臂：从盒子开始</h2>
+    <p>
+      机身主体是几个 <code>BoxGeometry</code> 叠出来的：上盖、下壳、电池仓、云台接口。
+      为了不像一块砖，边角用 <code>RoundedBox</code> 的思路处理，再靠材质和光照把轮廓拉出来。
+    </p>
+    <p>
+      机臂是细长的盒子，前端接电机座，内部走线用一条略暗的细圆柱暗示。
+      前后机臂分成两组，方便单独做折叠动画。
+    </p>
+
+    <h2>云台：两种镜头，一个壳</h2>
+    <p>
+      双摄云台是整个模型里零件最多的部分：一个横滚臂、一个俯仰臂、一个镜头壳、两个镜头圈、
+      两片镜片。镜片用 <code>CylinderGeometry</code> 压扁，材质给一点金属度和高粗糙度反射，
+      在画面里就会有一小圈亮边——那种「玻璃感」其实全靠这点反射。
+    </p>
+
+    <h2>螺旋桨：三叶，靠旋转复制</h2>
+    <p>
+      一片桨叶是拉伸出来的曲面，绕轴复制三次、每次转 120°，就是三叶桨。
+      四个桨座各挂一组，对角同向、相邻反向——这是四旋翼抵消反扭矩的方式，模型里也照这个来。
+    </p>
+    <pre><code>// 一片桨叶，复制三份，每份转 120°
+for (let i = 0; i &lt; 3; i++) {
+  const blade = makeBlade();
+  blade.rotation.y = (Math.PI * 2 / 3) * i;
+  hub.add(blade);
+}</code></pre>
+
+    <h2>拆解动画：一个数字控制全部</h2>
+    <p>
+      每个可拆零件都有自己的 <code>progress</code>（0 到 1）。点击某个零件时，目标值变成 1，
+      每帧朝目标插值一点点，位置就等于基准位置加上 <code>explode</code> 向量乘以 progress。
+      全部拆开就是把所有可拆零件的目标都设成 1。
+    </p>
+    <pre><code>part.position.copy(part.base).addScaledVector(part.explode, part.progress);</code></pre>
+    <p>
+      这样切换状态永远是平滑的，不会跳帧；也顺便得到了「结构分离度」那个百分比——
+      把所有 progress 平均一下就是。
+    </p>
+
+    <h2>连线和标签</h2>
+    <p>
+      场景里那些引线和文字标签不是三维物体，而是一层 SVG 覆盖在画布上。
+      每帧把三维坐标投影成屏幕坐标，再更新 SVG 线段和 <code>div</code> 的位置。
+      好处是文字永远清晰、不会随相机拉伸变形，样式也能直接用 CSS 写。
+    </p>
+
+    <h2>可以直接分享某个状态</h2>
+    <p>
+      页面读了两个 URL 参数：<code>?part=battery</code> 进来就选中并拆开电池，
+      <code>?exploded=1</code> 进来就是全部拆开的状态。两个可以叠加：
+    </p>
+    <pre><code>https://llla.ningfu334.workers.dev/lab/?part=battery&amp;exploded=1</code></pre>
+    <p>
+      本来是为了截图方便，后来发现分享单张「某个零件」的链接挺好用，就留着了。
+    </p>
+
+    <h2>性能上做的几件事</h2>
+    <ul>
+      <li>几何体全部在初始化时建好，动画里只改 <code>position</code> / <code>rotation</code>，不重建。</li>
+      <li>光照只用两盏方向光加环境光，没有开阴影贴图——阴影靠一个软圆片假装。</li>
+      <li>像素比压在 2 以内，移动端再降一档。</li>
+      <li>页面不可见时停掉渲染循环，回来再启动。</li>
+    </ul>
+
+    <h2>还没做的</h2>
+    <ul>
+      <li>真实材质的贴图（现在全是纯色 + 金属度）。</li>
+      <li>把拆解过程导出成视频，方便发到别的地方。</li>
+      <li>移动端单手拖拽的手感还能再调。</li>
+    </ul>
+
+    <hr />
+    <p>想拆哪一部分、想看哪块的结构，去<a href="../../guestbook/">留言板</a>说，我加进去。</p>
+  </article>
+
+  <nav class="pager">
+    <a class="prev" href="../build-log/">
+      <span class="lbl">上一篇</span>
+      <span class="ttl">← 这个小窝是怎么搭起来的</span>
+    </a>
+    <a class="next empty" href="#" aria-disabled="true">
+      <span class="lbl">下一篇</span>
+      <span class="ttl">已经在写了</span>
+    </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <p class="sig">以云为纸，以海为墨</p>
+  <p>© 2026 linao的小窝 · <a href="../">博文</a> · <a href="../../">首页</a></p>
+</footer>
+
+<script>
+(function () {
+  var html = document.documentElement;
+  var THEME_KEY = "linao-nest-theme", ACCENT_KEY = "linao-nest-accent";
+  var t = null, a = null;
+  try { t = localStorage.getItem(THEME_KEY); a = localStorage.getItem(ACCENT_KEY); } catch (e) {}
+  if (a && ["green", "pink", "blue"].indexOf(a) >= 0) html.dataset.accent = a;
+
+  var icon = document.getElementById("themeIcon");
+  function paint() {
+    icon.innerHTML = html.dataset.theme === "dark"
+      ? '<path d="M20 14.5A8.5 8.5 0 019.5 4 9 9 0 1020 14.5z"/>'
+      : '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
+  }
+  html.dataset.theme = t === "dark" ? "dark" : "light";
+  paint();
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+    paint();
+    try { localStorage.setItem(THEME_KEY, html.dataset.theme); } catch (e) {}
+  });
+
+  var bar = document.getElementById("progress");
+  function onScroll() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%";
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>

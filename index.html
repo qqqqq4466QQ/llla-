@@ -459,22 +459,22 @@ html[data-theme="dark"] .feature-copy .kicker{color:var(--accent-soft)}
       <a class="nav-link is-on" href="#top" data-key="home">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v8a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M9 21v-7h6v7"/></svg>主页
       </a>
-      <a class="nav-link" href="#latest" data-key="posts">
+      <a class="nav-link" href="./posts/" data-key="posts">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg>博文
       </a>
-      <a class="nav-link" href="#latest" data-key="stats">
+      <a class="nav-link" href="#" data-key="stats" data-todo="统计">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>统计
       </a>
-      <a class="nav-link" href="#latest" data-key="gallery">
+      <a class="nav-link" href="./gallery/" data-key="gallery">
         <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-6 6"/></svg>相册
       </a>
       <a class="nav-link" href="./lab/" target="_blank" rel="noopener" data-key="lab">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/></svg>实验室
       </a>
-      <a class="nav-link" href="#about" data-key="links">
+      <a class="nav-link" href="#" data-key="links" data-todo="友链">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a4 4 0 006 0l3-3a4 4 0 10-6-6l-1 1"/><path d="M14 11a4 4 0 00-6 0l-3 3a4 4 0 106 6l1-1"/></svg>友链
       </a>
-      <a class="nav-link" href="#latest" data-key="log">
+      <a class="nav-link" href="./posts/" data-key="log">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>日志
       </a>
       <a class="nav-link" href="./guestbook/" data-key="guestbook">
@@ -674,27 +674,30 @@ html[data-theme="dark"] .feature-copy .kicker{color:var(--accent-soft)}
       tag: "日志",
       title: "小窝的第一份装修记录",
       en: "BUILD LOG",
-      desc: "从一片空白到云海首页：排版、配色、还有那些改了很多遍的间距。",
-      date: "准备中",
-      soon: true
+      desc: "从一台要拆开的无人机，到云海首页、匿名留言板：中间推翻过一版设计，也换过一次后端。",
+      date: "2026.11.03",
+      href: "./posts/build-log/",
+      go: "读一读"
     },
     {
       mark: "🖼",
       tag: "相册",
       title: "云与山的碎片",
       en: "GALLERY",
-      desc: "拍到的天色、路过的云、翻过的山脊，攒够一卷就放上来。",
-      date: "准备中",
-      soon: true
+      desc: "实验室转出来的图、小窝自己长出来的样子，点开能看大图，左右键翻页。",
+      date: "2026.11.03",
+      href: "./gallery/",
+      go: "去看图"
     },
     {
       mark: "✍",
       tag: "博文",
       title: "把想法写成字",
-      en: "NOTES",
-      desc: "代码之外的一些记录，关于工具、习惯，和怎么把一件事慢慢做完。",
-      date: "准备中",
-      soon: true
+      en: "POSTS",
+      desc: "技术笔记和一些碎碎念：程序化建模怎么做、坑是怎么踩的、后来怎么爬出来。",
+      date: "2026.11.02",
+      href: "./posts/",
+      go: "去读"
     },
     {
       mark: "🔗",
@@ -744,7 +747,9 @@ html[data-theme="dark"] .feature-copy .kicker{color:var(--accent-soft)}
         if (p.soon) {
           return '<article class="card card--soon" data-soon="' + p.title + '">' + inner + '</article>';
         }
-        return '<a class="card" href="' + p.href + '" target="_blank" rel="noopener">' + inner + '</a>';
+        var external = p.href.indexOf("http") === 0;
+        return '<a class="card" href="' + p.href + '"' +
+          (external ? ' target="_blank" rel="noopener"' : "") + ">" + inner + "</a>";
       }).join("");
     }
     $("#resultNote").textContent = "共 " + list.length + " 条";
@@ -766,7 +771,10 @@ html[data-theme="dark"] .feature-copy .kicker{color:var(--accent-soft)}
   });
 
   $$("[data-todo]").forEach(function (btn) {
-    btn.addEventListener("click", function () { toast(btn.dataset.todo + " 功能还没接上，先随便逛逛吧～"); });
+    btn.addEventListener("click", function (e) {
+      if (btn.tagName === "A") e.preventDefault();
+      toast(btn.dataset.todo + " 功能还没接上，先随便逛逛吧～");
+    });
   });
 
   /* ---------------- 搜索 ---------------- */

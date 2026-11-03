@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0b1f1c" />
+<meta name="description" content="从一台要拆开的无人机，到云海首页、匿名留言板 —— 这个小窝是怎么一点点长出来的。" />
+<title>这个小窝是怎么搭起来的 · linao的小窝</title>
+<link rel="stylesheet" href="../post.css" />
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="../../">
+      <span class="brand-avatar" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><circle cx="20" cy="23" r="11" fill="#a8f0d2"/><path d="M11 13l3 9-8-5z" fill="#d8f7ea"/><path d="M29 13l-3 9 8-5z" fill="#d8f7ea"/><circle cx="16" cy="23" r="1.7" fill="#0b211d"/><circle cx="24" cy="23" r="1.7" fill="#0b211d"/><path d="M17.5 27.5q2.5 2 5 0" stroke="#0b211d" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </span>
+      <span class="brand-name">linao<em>的小窝</em></span>
+    </a>
+    <span class="crumb">/ 博文 / 装修记录</span>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深色模式">
+      <svg viewBox="0 0 24 24" aria-hidden="true" id="themeIcon"></svg>
+    </button>
+    <a class="back-pill" href="../">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H6M11 6l-6 6 6 6"/></svg>
+      全部博文
+    </a>
+  </div>
+</header>
+
+<section class="head">
+  <div class="head-inner">
+    <span class="kicker">日志 · BUILD LOG</span>
+    <h1>这个小窝是怎么搭起来的</h1>
+    <div class="meta">
+      <span>2026.11.03</span>
+      <span>约 6 分钟</span>
+      <span>标签：日志 / 前端 / Cloudflare</span>
+    </div>
+  </div>
+</section>
+<div class="wave" aria-hidden="true">
+  <svg viewBox="0 0 1440 72" preserveAspectRatio="none">
+    <path fill="var(--paper)" d="M0,34 C180,66 320,8 500,22 C680,36 780,68 960,56 C1140,44 1280,10 1440,26 L1440,72 L0,72 Z"/>
+  </svg>
+</div>
+
+<main>
+  <article>
+    <p>
+      一开始没有「小窝」这个概念，只有一台拆开的无人机。
+      后来东西越攒越多，才想着搭个门面把它们收起来。这篇把这几天做过的事、推翻过的东西、踩到的坑都记一下，
+      以后回头能看懂当时在想什么。
+    </p>
+
+    <h2>第一步：先有一个能转的东西</h2>
+    <p>
+      最初做的是 <strong>AIR 3S 三维拆解实验室</strong>：一台用代码现场生成几何体的无人机，
+      点一下云台、电池、图传核心，它会自己飘出来。整页只有三个文件，<code>index.html</code>、<code>styles.css</code>、
+      <code>app.js</code>，加一份本地托管的 <code>three.min.js</code>。
+    </p>
+    <p>
+      它本身是个单页应用，只有根路径。/lab/ 这个目录是后来挪的——为了给导航页腾地方。
+      搬完之后所有相对路径（<code>./styles.css</code>、<code>./vendor/three.min.js</code>）都不用改，因为它们本来就是相对的。
+    </p>
+
+    <h2>第二步：第一版门面，樱花粉</h2>
+    <p>
+      第一版导航页是粉色系：樱花飘落、圆滚滚的卡片、一只眨眼的小猫、贴纸一样的按钮。
+      所有卡片都从一个数组里渲染出来，加内容就是加一条：
+    </p>
+    <pre><code>{
+  id: "air3s",
+  title: "AIR 3S 拆解实验室",
+  url: "./lab/",
+  tag: "3D 实验室",
+  emoji: "🚁",
+  ready: true
+}</code></pre>
+    <p>
+      可爱是可爱，但看久了会觉得「门面」和「里面」是两套气质：外面是马卡龙，进去是冷色调的实验室。
+      所以有了第三版。
+    </p>
+
+    <h2>第三步：换成云海森林</h2>
+    <p>
+      现在的首页是这样的：深绿的云层、细密的雨丝、底部一层雾，中间一句「欢迎来到我的小窝」。
+      标题用黑体，引文用宋体，右上角能切深浅色，右下角那个调色盘可以把整站主色换成樱粉或雾蓝。
+    </p>
+    <blockquote>
+      <p>晨光不问赶路人，时光不负有心人。</p>
+    </blockquote>
+    <p>
+      技术上说没什么新鲜的：CSS 径向渐变画云、<code>filter: blur()</code> 让它软下来、
+      一条 <code>repeating-linear-gradient</code> 做雨丝、<code>mask-image</code> 做渐隐。
+      真正花时间的是调数值——云的位置、雾的浓度、字和背景的对比度，改了三十多次才不刺眼。
+    </p>
+
+    <h2>第四步：留言板，先后端换了两次</h2>
+    <p>
+      第一版想用 <strong>giscus</strong>（基于 GitHub Discussions）。方案很干净：不用服务器、不用数据库，
+      缺点是留言必须登录 GitHub 账号。代码写完、仓库 Discussions 也开了，最后卡在「应用没装到仓库」这一步。
+    </p>
+    <p>
+      后来想清楚了：这个站是给所有人看的，不是只给会写代码的人看的。<strong>那就自己写后端。</strong>
+    </p>
+    <p>
+      现在的留言板是 Cloudflare Worker + KV：
+    </p>
+    <pre><code>GET    /api/messages?limit=60      取留言（新的在前）
+POST   /api/messages               发留言 {"name","text","mood"}
+DELETE /api/messages/&lt;id&gt;          删留言（X-Admin-Token）
+GET    /api/health                 健康检查</code></pre>
+    <p>
+      匿名就能发，不用注册。规则都写在 Worker 里：名字 24 字、内容 500 字、每条最多一个链接、
+      同 IP 五分钟五条、蜜罐字段拦机器人。内容原样存进 KV，渲染的时候前端统一转义，所以
+      <code>&lt;script&gt;</code> 打不进来。
+    </p>
+
+    <h3>踩到的坑：KV 是最终一致的</h3>
+    <p>
+      本地测的时候一切正常，上线后发了条留言，列表里没有。查了半天才想起来——
+      Cloudflare KV 的 <code>list</code> 操作有几十秒延迟，实测这次是 30 秒左右。
+    </p>
+    <p>
+      处理办法很土但有效：发出去之后先把这条塞进本地列表，标上「刚刚 · 发送成功」，
+      然后 20 秒、45 秒各自动重新拉一次，等服务器列表里出现了，就把本地那条去掉。
+      发的人不会以为「我是不是没发出去」。
+    </p>
+    <p>
+      想彻底解决就得换 D1（SQL，强一致）。记在这儿，哪天有空再折腾。
+    </p>
+
+    <h2>现在的结构</h2>
+    <table>
+      <thead><tr><th>路径</th><th>是什么</th></tr></thead>
+      <tbody>
+        <tr><td><code>/</code></td><td>云海首页，所有入口在这</td></tr>
+        <tr><td><code>/lab/</code></td><td>AIR 3S 三维拆解实验室</td></tr>
+        <tr><td><code>/guestbook/</code></td><td>匿名留言板（Worker + KV）</td></tr>
+        <tr><td><code>/gallery/</code></td><td>相册，点开能看大图</td></tr>
+        <tr><td><code>/posts/</code></td><td>就是这里</td></tr>
+      </tbody>
+    </table>
+
+    <h2>一些想法</h2>
+    <ul>
+      <li>页面全是手写的 HTML / CSS / JS，没有框架、没有构建步骤，改完推上去 Cloudflare 自己部署。</li>
+      <li>每加一个东西，就多一个目录，首页多一张卡。导航页只做一件事：让人一眼看到有什么。</li>
+      <li>慢一点没关系，别把东西堆在草稿里。写着写着就成型了。</li>
+    </ul>
+
+    <hr />
+    <p>下一篇想写点具体的：那台无人机是怎么用代码堆出来的。如果对哪块细节感兴趣，去<a href="../../guestbook/">留言板</a>说一声，我照着写。</p>
+  </article>
+
+  <nav class="pager">
+    <a class="prev empty" href="#" aria-disabled="true">
+      <span class="lbl">上一篇</span>
+      <span class="ttl">已经是最早一篇了</span>
+    </a>
+    <a class="next" href="../air3s-teardown/">
+      <span class="lbl">下一篇</span>
+      <span class="ttl">用代码堆出来的无人机 →</span>
+    </a>
+  </nav>
+</main>
+
+<footer class="footer">
+  <p class="sig">以云为纸，以海为墨</p>
+  <p>© 2026 linao的小窝 · <a href="../">博文</a> · <a href="../../">首页</a></p>
+</footer>
+
+<script>
+(function () {
+  var html = document.documentElement;
+  var THEME_KEY = "linao-nest-theme", ACCENT_KEY = "linao-nest-accent";
+  var t = null, a = null;
+  try { t = localStorage.getItem(THEME_KEY); a = localStorage.getItem(ACCENT_KEY); } catch (e) {}
+  if (a && ["green", "pink", "blue"].indexOf(a) >= 0) html.dataset.accent = a;
+
+  var icon = document.getElementById("themeIcon");
+  function paint() {
+    icon.innerHTML = html.dataset.theme === "dark"
+      ? '<path d="M20 14.5A8.5 8.5 0 019.5 4 9 9 0 1020 14.5z"/>'
+      : '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
+  }
+  html.dataset.theme = t === "dark" ? "dark" : "light";
+  paint();
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+    paint();
+    try { localStorage.setItem(THEME_KEY, html.dataset.theme); } catch (e) {}
+  });
+
+  var bar = document.getElementById("progress");
+  function onScroll() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + "%";
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
