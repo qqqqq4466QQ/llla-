@@ -338,15 +338,39 @@ body.is-admin .shot-del{display:grid}
   }
 
   /* ---------------- 数据 ---------------- */
+  // KV 的列表有几十秒延迟：刚传的照片先本地插进去，删掉的先本地藏起来，
+  // 等服务器列表追上了再对齐，不然会以为「没传上去 / 没删掉」。
+  var serverPhotos = [];
+  var pendingPhotos = [];
+  var deletedIds = {};
+
+  function merged() {
+    var out = [], seen = {};
+    pendingPhotos.forEach(function (p) {
+      if (!deletedIds[p.id] && !seen[p.id]) { seen[p.id] = 1; out.push(p); }
+    });
+    serverPhotos.forEach(function (p) {
+      if (!deletedIds[p.id] && !seen[p.id]) { seen[p.id] = 1; out.push(p); }
+    });
+    return out;
+  }
+
+  function decorate(p) {
+    if (!p.src) p.src = API_BASE + p.url;
+    return p;
+  }
+
   function load() {
     return fetch(API_BASE + "/api/photos?limit=200", { headers: { Accept: "application/json" } })
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.ok) throw new Error(data.message || "读取失败");
-        photos = (data.photos || []).map(function (p) {
-          p.src = API_BASE + p.url;
-          return p;
-        });
+        var list = (data.photos || []).map(decorate);
+        var ids = {};
+        list.forEach(function (p) { ids[p.id] = 1; });
+        pendingPhotos = pendingPhotos.filter(function (p) { return !ids[p.id] && !deletedIds[p.id]; });
+        serverPhotos = list;
+        photos = merged();
         render();
       })
       .catch(function (err) {
@@ -584,6 +608,11 @@ body.is-admin .shot-del{display:grid}
             st.textContent = "完成";
             st.className = "qs ok";
             okCount++;
+            if (res.photo) {
+              pendingPhotos.unshift(decorate(res.photo));
+              photos = merged();
+              render();
+            }
           } else {
             bar.style.width = "100%";
             bar.style.background = "var(--danger)";
@@ -606,6 +635,8 @@ body.is-admin .shot-del{display:grid}
         $("#fTitle").value = "";
         $("#fCaption").value = "";
         load();
+        setTimeout(load, 30000);
+        setTimeout(load, 60000);
         setTimeout(function () { queueEl.innerHTML = ""; }, 2500);
       } else {
         toast("没传成功，看看上面的提示");
@@ -649,8 +680,15 @@ body.is-admin .shot-del{display:grid}
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.message || "删除失败");
+        deletedIds[id] = 1;
+        pendingPhotos = pendingPhotos.filter(function (p) { return p.id !== id; });
+        serverPhotos = serverPhotos.filter(function (p) { return p.id !== id; });
+        photos = merged();
+        render();
         toast("删掉了");
-        load();
+        // 服务器追上之前别让本地记录一直涨
+        setTimeout(function () { delete deletedIds[id]; }, 120000);
+        setTimeout(load, 30000);
       })
       .catch(function (err) { toast(String(err.message || "删除失败")); });
   });
