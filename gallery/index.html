@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0b1f1c" />
-<meta name="description" content="linao的小窝 · 相册 — 实验室的截图、小窝的样子，都收在这里。" />
+<meta name="description" content="linao的小窝 · 相册 — 随手放的照片都在这里，点开看大图。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e2621'/%3E%3Ccircle cx='32' cy='36' r='15' fill='%237fd6b4'/%3E%3Cpath d='M19 24l4 11-9-5z' fill='%23a8f0d2'/%3E%3Cpath d='M45 24l-4 11 9-5z' fill='%23a8f0d2'/%3E%3Ccircle cx='27' cy='36' r='2.2' fill='%230b1f1c'/%3E%3Ccircle cx='37' cy='36' r='2.2' fill='%230b1f1c'/%3E%3Cpath d='M28 42q4 3 8 0' stroke='%230b1f1c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
 <title>相册 · linao的小窝</title>
 <style>
@@ -12,6 +12,7 @@
   --paper:#f7faf8;--card:#ffffff;--line:#dbe7e1;
   --text:#16302a;--text-soft:#4c6560;--text-faint:#8aa29b;
   --accent:#7fd6b4;--accent-soft:#a8f0d2;--accent-deep:#2f8f6f;--accent-glow:rgba(127,214,180,.42);
+  --danger:#d9534f;
   --sans:"PingFang SC","Microsoft YaHei UI","Hiragino Sans GB","Noto Sans SC","Segoe UI",sans-serif;
   --serif:"Songti SC","Source Han Serif SC","Noto Serif SC",Georgia,serif;
   --mono:"Cascadia Mono","Consolas",monospace;
@@ -45,13 +46,15 @@ html[data-theme="dark"] .brand-name em{color:var(--accent)}
 .icon-btn{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--text-soft);transition:.2s var(--ease)}
 .icon-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .icon-btn:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+.icon-btn.is-admin{color:var(--accent-deep);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+html[data-theme="dark"] .icon-btn.is-admin{color:var(--accent)}
 .back-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:999px;font-size:12.5px;
   border:1px solid var(--line);color:var(--text-soft);transition:.22s var(--ease)}
 .back-pill:hover{color:var(--text);border-color:var(--accent-deep);transform:translateY(-1px)}
 .back-pill svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
 /* hero */
-.hero{position:relative;overflow:hidden;padding:54px 22px 44px;
+.hero{position:relative;overflow:hidden;padding:50px 22px 40px;
   background:radial-gradient(120% 92% at 50% 0%,#2b6353 0%,#1b463b 34%,#12302a 62%,#0a1f1b 100%);
   color:#eef7f3;text-align:center}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
@@ -65,64 +68,95 @@ html[data-theme="dark"] .brand-name em{color:var(--accent)}
 .hero .tip span{font-size:11.5px;padding:4px 11px;border-radius:999px;
   border:1px solid rgba(226,244,237,.18);background:rgba(233,247,241,.07);color:rgba(226,244,237,.8)}
 .wave{line-height:0;margin-top:-1px}
-.wave svg{width:100%;height:58px;display:block}
+.wave svg{width:100%;height:56px;display:block}
 
-main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
+main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:26px 22px 56px}
 
-/* 筛选 */
-.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:20px}
+/* 站长面板 */
+.admin-panel{
+  display:none;margin-bottom:22px;padding:20px;border-radius:20px;
+  background:var(--card);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--line));
+  box-shadow:0 26px 50px -44px rgba(8,23,20,.9);
+}
+.admin-panel.is-on{display:block}
+.admin-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.admin-head h2{margin:0;font-size:15px;font-weight:800}
+.admin-head .en{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--text-faint);text-transform:uppercase}
+.admin-head .spacer{flex:1}
+.tiny-btn{font-size:11.5px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--text-soft);transition:.2s}
+.tiny-btn:hover{color:var(--text);border-color:var(--accent-deep)}
+
+.drop{
+  position:relative;display:grid;place-items:center;gap:6px;padding:22px;border-radius:16px;
+  border:2px dashed color-mix(in srgb,var(--accent) 55%,var(--line));
+  background:color-mix(in srgb,var(--accent) 7%,transparent);
+  text-align:center;transition:.2s var(--ease);cursor:pointer;
+}
+.drop:hover,.drop.is-over{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:var(--accent-deep)}
+.drop b{font-size:13.5px}
+.drop small{color:var(--text-faint);font-size:11.5px;line-height:1.8}
+.drop input{display:none}
+
+.upload-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:14px}
+.upload-fields label{display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--text-faint);letter-spacing:.06em}
+.upload-fields input{
+  height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);
+  color:var(--text);font:inherit;font-size:13px;outline:none;transition:.2s;
+}
+.upload-fields input:focus{border-color:var(--accent-deep);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+
+.queue{display:grid;gap:8px;margin-top:14px}
+.q-item{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-soft)}
+.q-bar{flex:1;height:6px;border-radius:4px;background:color-mix(in srgb,var(--accent) 14%,transparent);overflow:hidden}
+.q-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-soft));transition:width .2s}
+.q-item .ok{color:var(--accent-deep);font-family:var(--mono);font-size:11px}
+.q-item .err{color:var(--danger);font-family:var(--mono);font-size:11px}
+
+/* 工具条 */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:18px}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
-.chip{
-  padding:7px 15px;border-radius:999px;border:1px solid var(--line);background:var(--card);
-  font-size:12.5px;color:var(--text-soft);transition:.2s var(--ease);
-}
+.chip{padding:7px 15px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+  font-size:12.5px;color:var(--text-soft);transition:.2s var(--ease)}
 .chip:hover{border-color:var(--accent-deep);color:var(--text);transform:translateY(-1px)}
-.chip[aria-pressed="true"]{
-  border-color:transparent;color:#08150f;font-weight:700;
-  background:linear-gradient(150deg,var(--accent-soft),var(--accent));
-  box-shadow:0 10px 22px -18px var(--accent-glow);
-}
+.chip[aria-pressed="true"]{border-color:transparent;color:#08150f;font-weight:700;
+  background:linear-gradient(150deg,var(--accent-soft),var(--accent));box-shadow:0 10px 22px -18px var(--accent-glow)}
 .chip .n{font-family:var(--mono);font-size:10.5px;opacity:.7;margin-left:5px}
 .count{font-family:var(--mono);font-size:11px;color:var(--text-faint)}
 
 /* 网格 */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.shot{
-  position:relative;display:block;border-radius:16px;overflow:hidden;background:var(--card);
+.shot{position:relative;border-radius:16px;overflow:hidden;background:var(--card);
   border:1px solid var(--line);box-shadow:0 22px 44px -40px rgba(8,23,20,.9);
-  transition:transform .32s var(--ease),border-color .3s,box-shadow .3s;
-  cursor:zoom-in;
-}
+  transition:transform .32s var(--ease),border-color .3s,box-shadow .3s}
 .shot:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
   box-shadow:0 28px 50px -38px rgba(8,23,20,.95)}
+.shot-open{display:block;cursor:zoom-in}
 .shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;transition:transform .5s var(--ease)}
 .shot:hover img{transform:scale(1.03)}
-.shot-meta{
-  position:absolute;left:0;right:0;bottom:0;
+.shot-meta{position:absolute;left:0;right:0;bottom:0;pointer-events:none;
   padding:34px 14px 12px;
   background:linear-gradient(to top,rgba(6,20,16,.82),rgba(6,20,16,.28) 60%,transparent);
-  color:#eef7f3;
-  display:flex;align-items:flex-end;justify-content:space-between;gap:10px;
-}
+  color:#eef7f3;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
 .shot-title{display:block;font-size:13px;font-weight:700;letter-spacing:.02em}
 .shot-sub{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:rgba(226,244,237,.65);margin-top:3px}
-.shot-tag{
-  flex:none;font-size:10px;padding:3px 9px;border-radius:999px;
-  background:rgba(233,247,241,.16);border:1px solid rgba(226,244,237,.24);color:#eafaf3;
+.shot-tag{flex:none;font-size:10px;padding:3px 9px;border-radius:999px;
+  background:rgba(233,247,241,.16);border:1px solid rgba(226,244,237,.24);color:#eafaf3}
+.shot-del{
+  position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:10px;display:none;place-items:center;
+  background:rgba(160,40,40,.82);border:1px solid rgba(255,220,220,.4);color:#fff;z-index:3;transition:.2s var(--ease);
 }
-.shot-zoom{
-  position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:10px;
-  display:grid;place-items:center;opacity:0;transform:scale(.9);transition:.24s var(--ease);
-  background:rgba(10,28,23,.6);border:1px solid rgba(226,244,237,.24);backdrop-filter:blur(6px);
-}
-.shot:hover .shot-zoom{opacity:1;transform:none}
-.shot-zoom svg{width:14px;height:14px;stroke:#eafaf3;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+body.is-admin .shot-del{display:grid}
+.shot-del:hover{background:rgba(200,50,50,.95);transform:scale(1.06)}
+.shot-del svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+.empty{padding:56px 22px;text-align:center;border-radius:20px;
+  border:1px dashed var(--line);background:color-mix(in srgb,var(--accent) 5%,var(--card));
+  color:var(--text-faint);font-size:13px;line-height:2.1}
+.empty b{color:var(--text-soft)}
+.empty .big{display:block;font-size:30px;margin-bottom:8px}
 
 /* 灯箱 */
-.lightbox{
-  position:fixed;inset:0;z-index:200;display:none;
-  background:rgba(4,14,11,.92);backdrop-filter:blur(8px);
-}
+.lightbox{position:fixed;inset:0;z-index:200;display:none;background:rgba(4,14,11,.92);backdrop-filter:blur(8px)}
 .lightbox[data-open="true"]{display:grid;grid-template-rows:1fr auto}
 .lb-stage{position:relative;display:grid;place-items:center;padding:40px 70px 10px;min-height:0}
 .lb-img{max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 40px 90px -40px #000;display:block}
@@ -130,34 +164,34 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
 .lb-cap{font-size:13.5px;letter-spacing:.02em}
 .lb-cap small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:rgba(226,244,237,.55);margin-top:4px}
 .lb-count{font-family:var(--mono);font-size:11px;color:rgba(226,244,237,.6);letter-spacing:.1em}
-.lb-btn{
-  position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
-  display:grid;place-items:center;background:rgba(233,247,241,.1);
-  border:1px solid rgba(226,244,237,.2);color:#eef7f3;transition:.2s var(--ease);
-}
+.lb-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(233,247,241,.1);border:1px solid rgba(226,244,237,.2);color:#eef7f3;transition:.2s var(--ease)}
 .lb-btn:hover{background:rgba(233,247,241,.2)}
 .lb-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .lb-prev{left:14px}.lb-next{right:14px}
-.lb-close{
-  position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;
-  display:grid;place-items:center;background:rgba(233,247,241,.1);border:1px solid rgba(226,244,237,.2);color:#eef7f3;
-}
+.lb-close{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(233,247,241,.1);border:1px solid rgba(226,244,237,.2);color:#eef7f3}
 .lb-close svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 
 .footer{padding:24px 22px 38px;text-align:center;border-top:1px solid var(--line);color:var(--text-faint);font-size:11.5px;line-height:2}
 .footer .sig{font-family:var(--serif);font-size:12.5px;letter-spacing:.18em;color:var(--text-soft)}
 
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);opacity:0;pointer-events:none;z-index:220;
+  padding:10px 18px;border-radius:999px;background:rgba(12,32,27,.94);color:#e6f3ee;
+  border:1px solid rgba(168,240,210,.28);font-size:12.5px;transition:transform .3s var(--ease),opacity .3s}
+.toast[data-show="true"]{transform:translate(-50%,0);opacity:1}
+
 @media (max-width:620px){
   .topbar-inner{padding:8px 14px;gap:10px}
   .brand-name{font-size:15px}
   .crumb{display:none}
-  .hero{padding:42px 18px 36px}
-  main{padding:22px 14px 44px}
+  .hero{padding:40px 18px 34px}
+  main{padding:20px 14px 44px}
   .grid{grid-template-columns:1fr;gap:14px}
   .lb-stage{padding:16px 12px 0}
   .lb-btn{width:38px;height:38px}
   .lb-prev{left:4px}.lb-next{right:4px}
-  .wave svg{height:44px}
+  .wave svg{height:40px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -174,6 +208,9 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
     </a>
     <span class="crumb">/ 相册</span>
     <span class="spacer"></span>
+    <button class="icon-btn" id="adminBtn" type="button" aria-label="站长模式" title="站长模式：输入口令后可上传 / 删除照片">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1A1.6 1.6 0 009 19.4a1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1A1.6 1.6 0 004.6 9a1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>
+    </button>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="切换深色模式">
       <svg viewBox="0 0 24 24" aria-hidden="true" id="themeIcon"></svg>
     </button>
@@ -188,8 +225,8 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
   <div class="hero-inner">
     <p class="kicker">Gallery · 相册</p>
     <h1>云与山的碎片</h1>
-    <p>实验室转出来的图、小窝自己长出来的样子，都扔在这里。<br />点开可以看大图，左右键能翻。</p>
-    <div class="tip"><span id="heroCount">7 张</span><span>2 个分类</span><span>可以点开放大</span></div>
+    <p>随手放的照片都在这里。<br />点开可以看大图，<kbd>←</kbd> <kbd>→</kbd> 能翻。</p>
+    <div class="tip"><span id="heroCount">0 张</span><span id="heroTags">—</span><span>点开可以放大</span></div>
   </div>
 </section>
 <div class="wave" aria-hidden="true">
@@ -199,10 +236,35 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
 </div>
 
 <main>
+  <!-- 站长面板：只有输入口令后才显示 -->
+  <section class="admin-panel" id="adminPanel" aria-label="站长上传面板">
+    <div class="admin-head">
+      <h2>站长模式</h2>
+      <span class="en">Admin</span>
+      <span class="spacer"></span>
+      <button class="tiny-btn" id="logoutBtn" type="button">退出站长模式</button>
+    </div>
+
+    <label class="drop" id="drop">
+      <input id="fileInput" type="file" accept="image/*" multiple />
+      <b>点这里选图片，或者把图拖进来</b>
+      <small>支持 jpg / png / webp / gif · 会先在浏览器里压到 1600px 再上传（单张上限 6 MB）</small>
+    </label>
+
+    <div class="upload-fields">
+      <label>标题（可选）<input id="fTitle" type="text" maxlength="60" placeholder="比如：傍晚的云" /></label>
+      <label>分类（可选）<input id="fTag" type="text" maxlength="16" placeholder="随手拍" /></label>
+      <label>一句话说明（可选）<input id="fCaption" type="text" maxlength="200" placeholder="拍的时候在想什么" /></label>
+    </div>
+
+    <div class="queue" id="queue"></div>
+  </section>
+
   <div class="toolbar">
     <div class="filters" id="filters" role="group" aria-label="按分类筛选"></div>
     <span class="count" id="count"></span>
   </div>
+
   <div class="grid" id="grid"></div>
 </main>
 
@@ -211,19 +273,12 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
   <p>© 2026 linao的小窝 · 相册</p>
 </footer>
 
-<!-- 灯箱 -->
 <div class="lightbox" id="lightbox" data-open="false" role="dialog" aria-modal="true" aria-label="查看大图">
   <div class="lb-stage">
-    <button class="lb-close" id="lbClose" type="button" aria-label="关闭">
-      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
-    </button>
-    <button class="lb-btn lb-prev" id="lbPrev" type="button" aria-label="上一张">
-      <svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
-    </button>
+    <button class="lb-close" id="lbClose" type="button" aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <button class="lb-btn lb-prev" id="lbPrev" type="button" aria-label="上一张"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
     <img class="lb-img" id="lbImg" alt="" />
-    <button class="lb-btn lb-next" id="lbNext" type="button" aria-label="下一张">
-      <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
-    </button>
+    <button class="lb-btn lb-next" id="lbNext" type="button" aria-label="下一张"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
   <div class="lb-bar">
     <div class="lb-cap"><span id="lbTitle"></span><small id="lbSub"></small></div>
@@ -231,90 +286,37 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
   </div>
 </div>
 
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
 <script>
 (function () {
   "use strict";
 
   /* =========================================================
-     ★ 相册清单：加照片就往这里加一条
-       把图放进 gallery/img/，写 filename、title、tag、sub、date
-       也支持外链：src 直接写完整 https 地址
+     照片全部存在 Cloudflare，不在代码里
+     站长：点右上角齿轮 → 输入口令 → 就能上传 / 删除
      ========================================================= */
-  var PHOTOS = [
-    {
-      src: "img/lab-live-exploded.jpg",
-      title: "全部拆开的样子",
-      sub: "AIR 3S · 09 MODULES",
-      tag: "实验室",
-      date: "2026.11.03",
-      desc: "九个模块一次散开，看得见电池、云台、图传核心都在哪一层。"
-    },
-    {
-      src: "img/lab-live-assembled.jpg",
-      title: "整机视角",
-      sub: "AIR 3S · ASSEMBLED",
-      tag: "实验室",
-      date: "2026.11.03",
-      desc: "默认视角，慢慢自转的整机。"
-    },
-    {
-      src: "img/lab-live-battery.jpg",
-      title: "把电池抽出来",
-      sub: "PART / BATTERY",
-      tag: "实验室",
-      date: "2026.11.03",
-      desc: "点一下电池，它会自己往上飘出来。"
-    },
-    {
-      src: "img/lab-render-exploded.jpg",
-      title: "拆解渲染图",
-      sub: "RENDER · EXPLODED",
-      tag: "实验室",
-      date: "2026.10.30",
-      desc: "早期导出的拆解渲染，用来对零件位置的。"
-    },
-    {
-      src: "img/lab-render-assembled.jpg",
-      title: "整机渲染图",
-      sub: "RENDER · ASSEMBLED",
-      tag: "实验室",
-      date: "2026.10.30",
-      desc: "同一套模型的整机渲染。"
-    },
-    {
-      src: "img/nest-home.jpg",
-      title: "小窝首页",
-      sub: "HOME · 2026.11",
-      tag: "小窝",
-      date: "2026.11.03",
-      desc: "云海、雨丝、那句「欢迎来到我的小窝」。"
-    },
-    {
-      src: "img/nest-guestbook.jpg",
-      title: "留言板",
-      sub: "GUESTBOOK",
-      tag: "小窝",
-      date: "2026.11.03",
-      desc: "不用登录就能写字的地方。"
-    }
-  ];
+  var API_BASE = "https://linao-guestbook.ningfu334.workers.dev";
+  var ADMIN_KEY = "linao-gallery-admin";
+  var THEME_KEY = "linao-nest-theme";
+  var ACCENT_KEY = "linao-nest-accent";
 
   var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   var html = document.documentElement;
-  var grid = $("#grid"), filtersEl = $("#filters"), countEl = $("#count");
 
-  /* ---------- 主题 ---------- */
-  var THEME_KEY = "linao-nest-theme", ACCENT_KEY = "linao-nest-accent";
+  var photos = [];
+  var adminToken = "";
+  try { adminToken = localStorage.getItem(ADMIN_KEY) || ""; } catch (e) {}
+
+  /* ---------------- 主题 ---------------- */
   var savedTheme = null, savedAccent = null;
-  try {
-    savedTheme = localStorage.getItem(THEME_KEY);
-    savedAccent = localStorage.getItem(ACCENT_KEY);
-  } catch (e) {}
+  try { savedTheme = localStorage.getItem(THEME_KEY); savedAccent = localStorage.getItem(ACCENT_KEY); } catch (e) {}
   if (savedAccent && ["green", "pink", "blue"].indexOf(savedAccent) >= 0) html.dataset.accent = savedAccent;
 
-  var icon = $("#themeIcon");
+  var themeIcon = $("#themeIcon");
   function paintIcon() {
-    icon.innerHTML = html.dataset.theme === "dark"
+    themeIcon.innerHTML = html.dataset.theme === "dark"
       ? '<path d="M20 14.5A8.5 8.5 0 019.5 4 9 9 0 1020 14.5z"/>'
       : '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
   }
@@ -326,64 +328,108 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
     try { localStorage.setItem(THEME_KEY, html.dataset.theme); } catch (e) {}
   });
 
-  /* ---------- 分类 ---------- */
-  var state = { tag: "全部" };
-  var tags = ["全部"];
-  PHOTOS.forEach(function (p) { if (tags.indexOf(p.tag) < 0) tags.push(p.tag); });
-
-  function renderFilters() {
-    filtersEl.innerHTML = tags.map(function (t) {
-      var n = t === "全部" ? PHOTOS.length : PHOTOS.filter(function (p) { return p.tag === t; }).length;
-      return '<button class="chip" type="button" data-tag="' + t + '" aria-pressed="' + (state.tag === t) + '">' +
-        t + '<span class="n">' + n + "</span></button>";
-    }).join("");
+  /* ---------------- 提示 ---------------- */
+  var toastEl = $("#toast"), toastTimer = null;
+  function toast(msg) {
+    toastEl.textContent = msg;
+    toastEl.dataset.show = "true";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.dataset.show = "false"; }, 2400);
   }
 
-  /* ---------- 列表 ---------- */
+  /* ---------------- 数据 ---------------- */
+  function load() {
+    return fetch(API_BASE + "/api/photos?limit=200", { headers: { Accept: "application/json" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.ok) throw new Error(data.message || "读取失败");
+        photos = (data.photos || []).map(function (p) {
+          p.src = API_BASE + p.url;
+          return p;
+        });
+        render();
+      })
+      .catch(function (err) {
+        $("#grid").innerHTML =
+          '<div class="empty" style="grid-column:1/-1"><span class="big">☁️</span>' +
+          "照片暂时读不出来…<br /><b>" + esc(String(err.message || err)) + "</b></div>";
+        $("#count").textContent = "离线";
+      });
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  var state = { tag: "全部" };
   var visible = [];
 
-  function renderGrid() {
-    visible = PHOTOS.filter(function (p) { return state.tag === "全部" || p.tag === state.tag; });
-    grid.innerHTML = visible.map(function (p, i) {
-      return (
-        '<a class="shot" href="' + p.src + '" data-i="' + i + '" aria-label="' + p.title + '">' +
-          '<img src="' + p.src + '" alt="' + p.title + '" loading="' + (i < 3 ? "eager" : "lazy") + '" />' +
-          '<span class="shot-zoom"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21M11 8v6M8 11h6"/></svg></span>' +
-          '<span class="shot-meta">' +
-            '<span><span class="shot-title">' + p.title + '</span><span class="shot-sub">' + p.sub + " · " + p.date + "</span></span>" +
-            '<span class="shot-tag">' + p.tag + "</span>" +
-          "</span>" +
-        "</a>"
-      );
+  function render() {
+    var tags = ["全部"];
+    photos.forEach(function (p) { if (tags.indexOf(p.tag) < 0) tags.push(p.tag); });
+    if (tags.indexOf(state.tag) < 0) state.tag = "全部";
+
+    $("#filters").innerHTML = tags.map(function (t) {
+      var n = t === "全部" ? photos.length : photos.filter(function (p) { return p.tag === t; }).length;
+      return '<button class="chip" type="button" data-tag="' + esc(t) + '" aria-pressed="' + (state.tag === t) + '">' +
+        esc(t) + '<span class="n">' + n + "</span></button>";
     }).join("");
-    countEl.textContent = "显示 " + visible.length + " / " + PHOTOS.length + " 张";
-    $("#heroCount").textContent = PHOTOS.length + " 张";
+
+    visible = photos.filter(function (p) { return state.tag === "全部" || p.tag === state.tag; });
+
+    if (!visible.length) {
+      $("#grid").innerHTML =
+        '<div class="empty" style="grid-column:1/-1"><span class="big">🖼</span>' +
+        (photos.length ? "这个分类还没有照片" :
+          "相册还是空的。<br /><b>点右上角齿轮</b>，输入口令就能往上传了") +
+        "</div>";
+    } else {
+      $("#grid").innerHTML = visible.map(function (p, i) {
+        var d = new Date(p.at);
+        var date = d.getFullYear() + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2);
+        return (
+          '<article class="shot" data-id="' + esc(p.id) + '" data-i="' + i + '">' +
+            '<button class="shot-del" type="button" data-del="' + esc(p.id) + '" title="删除这张">' +
+              '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg>' +
+            "</button>" +
+            '<a class="shot-open" href="' + esc(p.src) + '" target="_blank" rel="noopener">' +
+              '<img src="' + esc(p.src) + '" alt="' + esc(p.title) + '" loading="' + (i < 4 ? "eager" : "lazy") + '" />' +
+            "</a>" +
+            '<div class="shot-meta"><span><span class="shot-title">' + esc(p.title) + "</span>" +
+              '<span class="shot-sub">' + esc(p.tag) + " · " + date + "</span></span>" +
+              '<span class="shot-tag">' + esc(p.tag) + "</span></div>" +
+          "</article>"
+        );
+      }).join("");
+    }
+
+    var tagCount = tags.length - 1;
+    $("#count").textContent = "显示 " + visible.length + " / " + photos.length + " 张";
+    $("#heroCount").textContent = photos.length + " 张";
+    $("#heroTags").textContent = tagCount ? tagCount + " 个分类" : "还没有分类";
   }
 
-  filtersEl.addEventListener("click", function (e) {
+  $("#filters").addEventListener("click", function (e) {
     var btn = e.target.closest(".chip");
     if (!btn) return;
     state.tag = btn.dataset.tag;
-    renderFilters();
-    renderGrid();
+    render();
   });
 
-  /* ---------- 灯箱 ---------- */
-  var lb = $("#lightbox"), lbImg = $("#lbImg"), lbTitle = $("#lbTitle"),
-      lbSub = $("#lbSub"), lbCount = $("#lbCount");
-  var current = 0;
-
+  /* ---------------- 灯箱 ---------------- */
+  var lb = $("#lightbox"), lbImg = $("#lbImg"), current = 0;
   function show(i) {
     if (!visible.length) return;
     current = (i + visible.length) % visible.length;
     var p = visible[current];
     lbImg.src = p.src;
     lbImg.alt = p.title;
-    lbTitle.textContent = p.title;
-    lbSub.textContent = p.sub + " · " + p.date + (p.desc ? " · " + p.desc : "");
-    lbCount.textContent = (current + 1) + " / " + visible.length;
+    $("#lbTitle").textContent = p.title;
+    $("#lbSub").textContent = p.caption || (p.tag + " · " + Math.round((p.size || 0) / 1024) + " KB");
+    $("#lbCount").textContent = (current + 1) + " / " + visible.length;
   }
-
   function openLB(i) {
     lb.dataset.open = "true";
     document.documentElement.style.overflow = "hidden";
@@ -393,21 +439,19 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
     lb.dataset.open = "false";
     document.documentElement.style.overflow = "";
   }
-
-  grid.addEventListener("click", function (e) {
+  $("#grid").addEventListener("click", function (e) {
+    if (e.target.closest("[data-del]")) return;
     var shot = e.target.closest(".shot");
     if (!shot) return;
     e.preventDefault();
     openLB(Number(shot.dataset.i));
   });
-
   $("#lbClose").addEventListener("click", closeLB);
   $("#lbPrev").addEventListener("click", function () { show(current - 1); });
   $("#lbNext").addEventListener("click", function () { show(current + 1); });
   lb.addEventListener("click", function (e) {
     if (e.target === lb || e.target.classList.contains("lb-stage")) closeLB();
   });
-
   document.addEventListener("keydown", function (e) {
     if (lb.dataset.open !== "true") return;
     if (e.key === "Escape") closeLB();
@@ -415,9 +459,210 @@ main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:28px 22px 56px}
     else if (e.key === "ArrowRight") show(current + 1);
   });
 
-  /* ---------- 启动 ---------- */
-  renderFilters();
-  renderGrid();
+  /* ---------------- 站长模式 ---------------- */
+  var adminPanel = $("#adminPanel"), adminBtn = $("#adminBtn");
+
+  function setAdminUI(on) {
+    document.body.classList.toggle("is-admin", on);
+    adminPanel.classList.toggle("is-on", on);
+    adminBtn.classList.toggle("is-admin", on);
+    adminBtn.title = on ? "站长模式已开启（点一下退出）" : "站长模式：输入口令后可上传 / 删除照片";
+  }
+
+  function verifyToken(token) {
+    return fetch(API_BASE + "/api/photos/__verify__", {
+      method: "DELETE",
+      headers: { "X-Admin-Token": token }
+    }).then(function (r) { return r.status === 200; }).catch(function () { return false; });
+  }
+
+  function enterAdmin(token) {
+    adminToken = token;
+    try { localStorage.setItem(ADMIN_KEY, token); } catch (e) {}
+    setAdminUI(true);
+    toast("站长模式已开启，可以上传 / 删除照片了");
+  }
+
+  function leaveAdmin(silent) {
+    adminToken = "";
+    try { localStorage.removeItem(ADMIN_KEY); } catch (e) {}
+    setAdminUI(false);
+    if (!silent) toast("已退出站长模式");
+  }
+
+  adminBtn.addEventListener("click", function () {
+    if (adminToken) { leaveAdmin(false); return; }
+    var input = window.prompt("输入站长口令（就是 ADMIN_TOKEN）：");
+    if (!input) return;
+    var token = input.trim();
+    if (!token) return;
+    toast("正在验证…");
+    verifyToken(token).then(function (ok) {
+      if (ok) enterAdmin(token);
+      else toast("口令不对，再试一次？");
+    });
+  });
+
+  $("#logoutBtn").addEventListener("click", function () { leaveAdmin(false); });
+
+  /* ---------------- 上传 ---------------- */
+  var queueEl = $("#queue");
+
+  function addQueueItem(name) {
+    var row = document.createElement("div");
+    row.className = "q-item";
+    row.innerHTML = '<span style="max-width:40%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(name) + "</span>" +
+      '<span class="q-bar"><i></i></span><span class="qs">等待</span>';
+    queueEl.appendChild(row);
+    return row;
+  }
+
+  // 浏览器里先压一遍，避免把几 MB 的原图塞进 KV
+  function compress(file, maxSide, quality) {
+    return new Promise(function (resolve) {
+      if (!/^image\//.test(file.type) || file.type === "image/gif") { resolve(file); return; }
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function () {
+        var w = img.naturalWidth, h = img.naturalHeight;
+        var scale = Math.min(1, maxSide / Math.max(w, h));
+        if (scale === 1 && file.size < 400 * 1024) { URL.revokeObjectURL(url); resolve(file); return; }
+        var c = document.createElement("canvas");
+        c.width = Math.round(w * scale);
+        c.height = Math.round(h * scale);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        c.toBlob(function (blob) {
+          URL.revokeObjectURL(url);
+          resolve(blob || file);
+        }, "image/jpeg", quality || 0.82);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
+  }
+
+  function uploadOne(file, meta) {
+    return compress(file, 1600, 0.82).then(function (blob) {
+      var isBlob = blob instanceof Blob;
+      var name = file.name.replace(/\.[^.]+$/, "") + (isBlob && blob.type === "image/jpeg" ? ".jpg" : "");
+      var fd = new FormData();
+      fd.append("file", isBlob ? new File([blob], name, { type: blob.type || "image/jpeg" }) : file);
+      fd.append("title", meta.title || file.name.replace(/\.[^.]+$/, ""));
+      fd.append("caption", meta.caption || "");
+      fd.append("tag", meta.tag || "随手拍");
+      return fetch(API_BASE + "/api/photos", {
+        method: "POST",
+        headers: { "X-Admin-Token": adminToken },
+        body: fd
+      }).then(function (r) { return r.json(); });
+    });
+  }
+
+  function handleFiles(fileList) {
+    if (!adminToken) { toast("先点右上角齿轮开启站长模式"); return; }
+    var files = Array.prototype.slice.call(fileList).filter(function (f) { return /^image\//.test(f.type); });
+    if (!files.length) { toast("只认图片文件哦"); return; }
+
+    var meta = {
+      title: $("#fTitle").value.trim(),
+      tag: $("#fTag").value.trim(),
+      caption: $("#fCaption").value.trim()
+    };
+
+    var okCount = 0;
+    var chain = Promise.resolve();
+    files.forEach(function (file) {
+      chain = chain.then(function () {
+        var row = addQueueItem(file.name);
+        var bar = row.querySelector("i");
+        var st = row.querySelector(".qs");
+        bar.style.width = "35%";
+        st.textContent = "上传中";
+        return uploadOne(file, meta).then(function (res) {
+          if (res && res.ok) {
+            bar.style.width = "100%";
+            st.textContent = "完成";
+            st.className = "qs ok";
+            okCount++;
+          } else {
+            bar.style.width = "100%";
+            bar.style.background = "var(--danger)";
+            st.textContent = (res && res.message) || "失败";
+            st.className = "qs err";
+          }
+        }).catch(function (err) {
+          bar.style.width = "100%";
+          bar.style.background = "var(--danger)";
+          st.textContent = "网络错误";
+          st.className = "qs err";
+          console.warn(err);
+        });
+      });
+    });
+
+    chain.then(function () {
+      if (okCount) {
+        toast("传好了 " + okCount + " 张");
+        $("#fTitle").value = "";
+        $("#fCaption").value = "";
+        load();
+        setTimeout(function () { queueEl.innerHTML = ""; }, 2500);
+      } else {
+        toast("没传成功，看看上面的提示");
+      }
+    });
+  }
+
+  var drop = $("#drop"), fileInput = $("#fileInput");
+  drop.addEventListener("click", function (e) {
+    if (e.target === fileInput) return;
+    if (!adminToken) { toast("先点右上角齿轮开启站长模式"); return; }
+    fileInput.click();
+  });
+  fileInput.addEventListener("change", function () {
+    handleFiles(fileInput.files);
+    fileInput.value = "";
+  });
+  ["dragenter", "dragover"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("is-over"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("is-over"); });
+  });
+  drop.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+  });
+
+  /* ---------------- 删除 ---------------- */
+  $("#grid").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-del]");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (!adminToken) { toast("先开启站长模式"); return; }
+    var id = btn.dataset.del;
+    if (!window.confirm("确定删掉这张照片吗？删了找不回来。")) return;
+    fetch(API_BASE + "/api/photos/" + encodeURIComponent(id), {
+      method: "DELETE",
+      headers: { "X-Admin-Token": adminToken }
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.message || "删除失败");
+        toast("删掉了");
+        load();
+      })
+      .catch(function (err) { toast(String(err.message || "删除失败")); });
+  });
+
+  /* ---------------- 启动 ---------------- */
+  if (adminToken) {
+    // 记住的口令先校验一次，失效就静默退出
+    verifyToken(adminToken).then(function (ok) {
+      if (ok) setAdminUI(true); else leaveAdmin(true);
+    });
+  }
+  load();
 })();
 </script>
 </body>
