@@ -4,12 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="theme-color" content="#0b1f1c" />
-<meta name="description" content="linao的小窝 · 留言板 — 说点什么吧，我都会看。" />
+<meta name="description" content="linao的小窝 · 留言板 — 不用登录，写两句就走。" />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e2621'/%3E%3Ccircle cx='32' cy='36' r='15' fill='%237fd6b4'/%3E%3Cpath d='M19 24l4 11-9-5z' fill='%23a8f0d2'/%3E%3Cpath d='M45 24l-4 11 9-5z' fill='%23a8f0d2'/%3E%3Ccircle cx='27' cy='36' r='2.2' fill='%230b1f1c'/%3E%3Ccircle cx='37' cy='36' r='2.2' fill='%230b1f1c'/%3E%3Cpath d='M28 42q4 3 8 0' stroke='%230b1f1c' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
 <title>留言板 · linao的小窝</title>
 <style>
 :root{
-  --forest-deep:#0b211d;--forest:#12302a;--moss:#1b463b;
   --paper:#f7faf8;--card:#ffffff;--line:#dbe7e1;
   --text:#16302a;--text-soft:#4c6560;--text-faint:#8aa29b;
   --accent:#7fd6b4;--accent-soft:#a8f0d2;--accent-deep:#2f8f6f;--accent-glow:rgba(127,214,180,.42);
@@ -24,8 +23,7 @@ html[data-theme="dark"]{--paper:#0d1f1b;--card:#122a24;--line:#1d3a32;--text:#e6
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);
-  -webkit-font-smoothing:antialiased;transition:background .4s,color .4s;min-height:100dvh;
-  display:flex;flex-direction:column}
+  -webkit-font-smoothing:antialiased;transition:background .4s,color .4s;min-height:100dvh;display:flex;flex-direction:column}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 ::selection{background:var(--accent);color:#08150f}
@@ -33,7 +31,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(247,250,248,.82);backdrop-filter:blur(16px);
   border-bottom:1px solid rgba(22,48,42,.07);transition:background .4s,border-color .4s}
 html[data-theme="dark"] .topbar{background:rgba(10,26,23,.84);border-bottom-color:rgba(231,240,236,.08)}
-.topbar-inner{max-width:1040px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:14px}
+.topbar-inner{max-width:1000px;margin:0 auto;padding:10px 22px;display:flex;align-items:center;gap:14px}
 .brand{display:flex;align-items:center;gap:9px}
 .brand-avatar{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;
   background:linear-gradient(160deg,#12302a,#1b463b);box-shadow:0 4px 12px -6px rgba(18,48,42,.8)}
@@ -51,7 +49,7 @@ html[data-theme="dark"] .brand-name em{color:var(--accent)}
 .back-pill:hover{color:var(--text);border-color:var(--accent-deep);transform:translateY(-1px)}
 .back-pill svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-.hero{position:relative;overflow:hidden;padding:56px 22px 44px;
+.hero{position:relative;overflow:hidden;padding:54px 22px 42px;
   background:radial-gradient(120% 92% at 50% 0%,#2b6353 0%,#1b463b 34%,#12302a 62%,#0a1f1b 100%);
   color:#eef7f3;text-align:center}
 .hero::before{content:"";position:absolute;inset:0;pointer-events:none;
@@ -59,67 +57,98 @@ html[data-theme="dark"] .brand-name em{color:var(--accent)}
              radial-gradient(50% 50% at 82% 12%,rgba(159,208,255,.12),transparent 72%)}
 .hero-inner{position:relative;max-width:720px;margin:0 auto}
 .hero .kicker{font-family:var(--mono);font-size:10px;letter-spacing:.38em;color:rgba(210,240,230,.6);text-transform:uppercase}
-.hero h1{margin:14px 0 12px;font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:.04em;
-  text-shadow:0 16px 44px rgba(0,0,0,.45)}
+.hero h1{margin:14px 0 12px;font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:.04em;text-shadow:0 16px 44px rgba(0,0,0,.45)}
 .hero p{margin:0;font-size:13.5px;line-height:2;color:rgba(226,244,237,.72)}
 .hero .tip{display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
 .hero .tip span{font-size:11.5px;padding:4px 11px;border-radius:999px;
   border:1px solid rgba(226,244,237,.18);background:rgba(233,247,241,.07);color:rgba(226,244,237,.8)}
-.wave{position:relative;line-height:0;margin-top:-1px}
-.wave svg{width:100%;height:64px;display:block}
+.wave{line-height:0;margin-top:-1px}
+.wave svg{width:100%;height:60px;display:block}
 
-main{flex:1;width:100%;max-width:1040px;margin:0 auto;padding:34px 22px 60px}
+main{flex:1;width:100%;max-width:1000px;margin:0 auto;padding:30px 22px 56px}
 
 .panel{background:var(--card);border:1px solid var(--line);border-radius:22px;
-  box-shadow:0 26px 60px -46px rgba(8,23,20,.8);padding:22px 22px 26px}
+  box-shadow:0 26px 60px -46px rgba(8,23,20,.8);padding:22px;margin-bottom:22px}
 .panel-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .panel-head h2{margin:0;font-size:17px;font-weight:800;letter-spacing:.03em}
 .panel-head .en{font-family:var(--mono);font-size:10px;letter-spacing:.24em;color:var(--text-faint);text-transform:uppercase}
 .panel-head .line{flex:1;height:1px;min-width:30px;background:linear-gradient(90deg,var(--line),transparent)}
 .panel-head .count{font-family:var(--mono);font-size:11px;color:var(--text-faint)}
 
-.notice{
-  display:flex;gap:12px;align-items:flex-start;
-  padding:14px 16px;border-radius:16px;margin-bottom:18px;
-  background:color-mix(in srgb,var(--accent) 12%,transparent);
-  border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);
-  font-size:12.5px;line-height:1.85;color:var(--text-soft);
+/* 表单 */
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.field{
+  flex:1 1 220px;display:flex;align-items:center;gap:8px;padding:0 14px;height:44px;border-radius:999px;
+  border:1px solid var(--line);background:var(--paper);transition:.2s;
 }
-.notice b{color:var(--text)}
-.notice svg{flex:none;width:16px;height:16px;margin-top:3px;stroke:var(--accent-deep);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-html[data-theme="dark"] .notice svg{stroke:var(--accent)}
-.notice code{font-family:var(--mono);font-size:11.5px;background:var(--paper);border:1px solid var(--line);
-  border-radius:5px;padding:1px 6px}
-.notice a{color:var(--accent-deep);border-bottom:1px dashed color-mix(in srgb,var(--accent) 60%,transparent)}
-html[data-theme="dark"] .notice a{color:var(--accent)}
-.install-btn{
-  display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;border-radius:999px;
-  font-size:12px;font-weight:600;color:#08150f !important;border:0 !important;
+.field:focus-within{border-color:var(--accent-deep);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.field input{flex:1;border:0;background:transparent;outline:none;font:inherit;font-size:14px;color:var(--text)}
+.field svg{width:15px;height:15px;stroke:var(--text-faint);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.moods{display:flex;gap:6px;flex-wrap:wrap}
+.mood{
+  width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:17px;
+  border:1px solid var(--line);background:var(--paper);transition:.18s var(--ease);opacity:.65;
+}
+.mood:hover{transform:translateY(-2px);opacity:1}
+.mood[aria-pressed="true"]{
+  opacity:1;border-color:color-mix(in srgb,var(--accent) 60%,transparent);
+  background:color-mix(in srgb,var(--accent) 18%,transparent);
+  box-shadow:0 6px 16px -12px var(--accent-glow);
+}
+
+.textarea-wrap{position:relative}
+textarea{
+  width:100%;min-height:120px;resize:vertical;padding:14px 16px 34px;border-radius:16px;
+  border:1px solid var(--line);background:var(--paper);color:var(--text);
+  font:inherit;font-size:14px;line-height:1.9;outline:none;transition:.2s;
+}
+textarea:focus{border-color:var(--accent-deep);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+.counter{position:absolute;right:14px;bottom:10px;font-family:var(--mono);font-size:11px;color:var(--text-faint)}
+.counter.over{color:#d9534f}
+
+.form-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap}
+.hint{font-size:11.5px;color:var(--text-faint);line-height:1.7}
+.submit{
+  display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:999px;
+  font-size:13.5px;font-weight:700;color:#08150f;
   background:linear-gradient(150deg,var(--accent-soft),var(--accent));
-  box-shadow:0 10px 22px -16px var(--accent-glow);transition:.22s var(--ease);
+  box-shadow:0 14px 28px -18px var(--accent-glow);transition:.22s var(--ease);
 }
-.install-btn:hover{transform:translateY(-1px)}
-.install-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.submit:hover{transform:translateY(-2px)}
+.submit:disabled{opacity:.55;cursor:progress;transform:none}
+.submit svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 
-.giscus-host{min-height:220px}
-.giscus, .giscus-frame{width:100%;border:0;color-scheme:light}
-html[data-theme="dark"] .giscus{color-scheme:dark}
+/* 列表 */
+.msg{
+  display:flex;gap:12px;padding:16px 4px;border-bottom:1px dashed var(--line);
+}
+.msg:last-child{border-bottom:0}
+.msg-avatar{
+  flex:none;width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;
+  background:color-mix(in srgb,var(--accent) 16%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
+}
+.msg-body{min-width:0;flex:1}
+.msg-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.msg-name{font-weight:700;font-size:13.5px}
+.msg-time{font-family:var(--mono);font-size:10.5px;color:var(--text-faint);letter-spacing:.06em}
+.msg-text{margin:6px 0 0;font-size:13.5px;line-height:1.95;color:var(--text-soft);white-space:pre-wrap;word-break:break-word}
 
-.skeleton{padding:6px 2px}
-.skeleton .row{height:14px;border-radius:7px;margin-bottom:12px;
-  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--accent) 4%,transparent),color-mix(in srgb,var(--accent) 12%,transparent));
-  background-size:200% 100%;animation:shimmer 1.6s linear infinite}
-.skeleton .row:nth-child(2){width:72%}
-.skeleton .row:nth-child(3){width:88%}
-.skeleton .row:nth-child(4){width:54%;margin-bottom:0}
-@keyframes shimmer{to{background-position:-200% 0}}
+.state{padding:34px 10px;text-align:center;color:var(--text-faint);font-size:13px;line-height:2}
+.state b{color:var(--text-soft)}
+.state a{color:var(--accent-deep);border-bottom:1px dashed color-mix(in srgb,var(--accent) 50%,transparent)}
+html[data-theme="dark"] .state a{color:var(--accent)}
+.sk{display:grid;gap:12px;padding:10px 4px}
+.sk i{display:block;height:13px;border-radius:7px;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 12%,transparent),color-mix(in srgb,var(--accent) 3%,transparent),color-mix(in srgb,var(--accent) 12%,transparent));
+  background-size:200% 100%;animation:sh 1.6s linear infinite}
+.sk i:nth-child(2){width:64%}
+.sk i:nth-child(3){width:82%}
+@keyframes sh{to{background-position:-200% 0}}
 
-.help{margin-top:22px;font-size:12px;color:var(--text-faint);line-height:2;text-align:center}
-.help a{color:var(--accent-deep);border-bottom:1px dashed color-mix(in srgb,var(--accent) 50%,transparent)}
-html[data-theme="dark"] .help a{color:var(--accent)}
-
-.footer{padding:26px 22px 40px;text-align:center;border-top:1px solid var(--line);
-  color:var(--text-faint);font-size:11.5px;line-height:2}
+.footer{padding:24px 22px 38px;text-align:center;border-top:1px solid var(--line);color:var(--text-faint);font-size:11.5px;line-height:2}
 .footer .sig{font-family:var(--serif);font-size:12.5px;letter-spacing:.18em;color:var(--text-soft)}
 
 .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);opacity:0;pointer-events:none;z-index:120;
@@ -131,10 +160,12 @@ html[data-theme="dark"] .help a{color:var(--accent)}
   .topbar-inner{padding:8px 14px;gap:10px}
   .brand-name{font-size:15px}
   .crumb{display:none}
-  .hero{padding:44px 18px 38px}
-  main{padding:24px 14px 46px}
-  .panel{padding:18px 14px 22px;border-radius:18px}
-  .wave svg{height:46px}
+  .hero{padding:42px 18px 36px}
+  main{padding:22px 14px 44px}
+  .panel{padding:16px 14px;border-radius:18px}
+  .form-foot{flex-direction:column;align-items:stretch}
+  .submit{justify-content:center}
+  .wave svg{height:44px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -164,12 +195,12 @@ html[data-theme="dark"] .help a{color:var(--accent)}
 <section class="hero">
   <div class="hero-inner">
     <p class="kicker">Guestbook · 留言板</p>
-    <h1>来都来了，说句话吧</h1>
-    <p>问问题、挑毛病、聊两句，或者只是打个招呼，都可以。<br />我都会看，也会回。</p>
+    <h1>来都来了，写两句吧</h1>
+    <p>不用注册、不用登录，写上名字就能留。<br />骂我也行，夸我也行，路过打个招呼也行。</p>
     <div class="tip">
-      <span>GitHub 账号登录</span>
-      <span>支持 Markdown</span>
-      <span>可以加表情回应</span>
+      <span>匿名留言</span>
+      <span>不用等审核</span>
+      <span>五分钟能说五句</span>
     </div>
   </div>
 </section>
@@ -180,40 +211,51 @@ html[data-theme="dark"] .help a{color:var(--accent)}
 </div>
 
 <main>
-  <div class="panel">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>写点什么</h2>
+      <span class="en">Leave a note</span>
+      <span class="line"></span>
+      <span class="count" id="formNote">最多 500 字</span>
+    </div>
+
+    <form id="form" autocomplete="off">
+      <div class="form-row">
+        <label class="field">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20a7.5 7.5 0 0115 0"/></svg>
+          <input id="name" name="name" type="text" maxlength="24" placeholder="你的名字（不写就是「路过的人」）" aria-label="你的名字" />
+        </label>
+        <div class="moods" id="moods" role="group" aria-label="选个心情"></div>
+      </div>
+
+      <div class="textarea-wrap">
+        <textarea id="text" name="text" maxlength="500" placeholder="想说的话…&#10;（可以换行，最多 500 字，最多放一个链接）" aria-label="留言内容"></textarea>
+        <span class="counter" id="counter">0 / 500</span>
+      </div>
+
+      <input class="hp" id="hp" name="hp" type="text" tabindex="-1" aria-hidden="true" />
+
+      <div class="form-foot">
+        <span class="hint">留言会出现在下面的列表里 · 请别发广告和攻击别人的话</span>
+        <button class="submit" id="submit" type="submit">
+          发出去
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l16-8-6 16-3-6-7-2z"/></svg>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
     <div class="panel-head">
       <h2>大家的留言</h2>
       <span class="en">Messages</span>
       <span class="line"></span>
       <span class="count" id="count">加载中…</span>
     </div>
-
-    <div class="notice" id="notice">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
-      <div>
-        留言会存进这个仓库的
-        <a href="https://github.com/qqqqq4466QQ/llla-/discussions" target="_blank" rel="noopener">Discussions</a>，
-        所以不会丢，也不需要注册会员。<br />
-        <b>第一次打开如果提示 giscus 未安装</b>：站长去装一次就行（选中 <code>llla-</code> 仓库，10 秒）。
-        <a class="install-btn" href="https://github.com/apps/giscus/installations/new" target="_blank" rel="noopener">
-          去安装 giscus
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12 6l6 6-6 6"/></svg>
-        </a>
-      </div>
+    <div id="list" aria-live="polite">
+      <div class="sk"><i></i><i></i><i></i></div>
     </div>
-
-    <div class="giscus-host" id="giscusHost">
-      <div class="skeleton" id="skeleton" aria-hidden="true">
-        <div class="row"></div><div class="row"></div><div class="row"></div><div class="row"></div>
-      </div>
-    </div>
-  </div>
-
-  <p class="help">
-    留言走的是 <a href="https://giscus.app" target="_blank" rel="noopener">giscus</a> ·
-    存在 GitHub Discussions 里，公开可读 ·
-    不想登录 GitHub 的话，也可以去 <a href="../lab/" target="_blank" rel="noopener">实验室</a> 转转再回来
-  </p>
+  </section>
 </main>
 
 <footer class="footer">
@@ -227,146 +269,193 @@ html[data-theme="dark"] .help a{color:var(--accent)}
 (function () {
   "use strict";
 
+  /* =========================================================
+     后端地址（Cloudflare Worker）
+     ========================================================= */
+  var API_BASE = "https://linao-guestbook.ningfu334.workers.dev";
+  var qs = new URLSearchParams(location.search);
+  if (qs.get("api")) API_BASE = qs.get("api");
+
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var html = document.documentElement;
+  var MOODS = ["🌿", "☁️", "🌊", "🍃", "✨", "🐾", "🌙", "🍵"];
+  var currentMood = "🌿";
 
-  /* ---------- 主题（与首页共用同一个 key） ---------- */
+  /* ---------------- 主题 ---------------- */
   var THEME_KEY = "linao-nest-theme";
-  var ACCENT_KEY = "linao-nest-accent";
-  var savedTheme = null, savedAccent = null;
-  try {
-    savedTheme = localStorage.getItem(THEME_KEY);
-    savedAccent = localStorage.getItem(ACCENT_KEY);
-  } catch (e) {}
-  if (savedAccent && ["green", "pink", "blue"].indexOf(savedAccent) >= 0) html.dataset.accent = savedAccent;
-
-  var icon = $("#themeIcon"), giscusFrame = null, giscusReady = false;
-
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  var icon = $("#themeIcon");
   function paintIcon() {
-    if (html.dataset.theme === "dark") {
-      icon.innerHTML = '<path d="M20 14.5A8.5 8.5 0 019.5 4 9 9 0 1020 14.5z"/>';
-    } else {
-      icon.innerHTML = '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
-    }
+    icon.innerHTML = html.dataset.theme === "dark"
+      ? '<path d="M20 14.5A8.5 8.5 0 019.5 4 9 9 0 1020 14.5z"/>'
+      : '<circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/>';
   }
   function setTheme(mode, persist) {
     html.dataset.theme = mode;
     paintIcon();
     if (persist) { try { localStorage.setItem(THEME_KEY, mode); } catch (e) {} }
-    if (giscusReady && giscusFrame) {
-      giscusFrame.contentWindow.postMessage({
-        giscus: { setConfig: { theme: mode === "dark" ? "dark" : "light" } }
-      }, "https://giscus.app");
-    }
   }
   setTheme(savedTheme === "dark" ? "dark" : "light", false);
   $("#themeBtn").addEventListener("click", function () {
     setTheme(html.dataset.theme === "dark" ? "light" : "dark", true);
   });
 
-  /* ---------- giscus 配置 ---------- */
-  var GISCUS = {
-    repo: "qqqqq4466QQ/llla-",
-    repoId: "R_kgDOVgJs_A",
-    category: "Announcements",
-    categoryId: "DIC_kwDOVgJs_M4DKRoL",
-    mapping: "specific",
-    term: "guestbook",
-    strict: "0",
-    reactionsEnabled: "1",
-    emitMetadata: "0",
-    inputPosition: "top",
-    lang: "zh-CN"
-  };
-
-  var mounted = false;
-  function mountGiscus() {
-    if (mounted) return;
-    mounted = true;
-    var s = document.createElement("script");
-    s.src = "https://giscus.app/client.js";
-    s.async = true;
-    s.crossOrigin = "anonymous";
-    s.setAttribute("data-repo", GISCUS.repo);
-    s.setAttribute("data-repo-id", GISCUS.repoId);
-    s.setAttribute("data-category", GISCUS.category);
-    s.setAttribute("data-category-id", GISCUS.categoryId);
-    s.setAttribute("data-mapping", GISCUS.mapping);
-    s.setAttribute("data-term", GISCUS.term);
-    s.setAttribute("data-strict", GISCUS.strict);
-    s.setAttribute("data-reactions-enabled", GISCUS.reactionsEnabled);
-    s.setAttribute("data-emit-metadata", GISCUS.emitMetadata);
-    s.setAttribute("data-input-position", GISCUS.inputPosition);
-    s.setAttribute("data-theme", html.dataset.theme === "dark" ? "dark" : "light");
-    s.setAttribute("data-lang", GISCUS.lang);
-    s.setAttribute("data-loading", "lazy");
-    document.getElementById("giscusHost").appendChild(s);
-    setTimeout(function () {
-      var sk = $("#skeleton");
-      if (sk && !giscusReady) sk.remove();
-    }, 2500);
-
-    // 8 秒还没收到 giscus 的讨论数据 → 大概率是应用没装
-    setTimeout(function () {
-      if (giscusReady) return;
-      $("#count").textContent = "评论区还没装好";
-      var n = $("#notice");
-      if (n && !n.dataset.warned) {
-        n.dataset.warned = "1";
-        n.style.borderColor = "color-mix(in srgb, #ffb45e 60%, transparent)";
-        n.style.background = "color-mix(in srgb, #ffb45e 14%, transparent)";
-      }
-    }, 8000);
-  }
-
-  /* 懒加载：进入视口或 1.2s 后挂载 */
-  if ("IntersectionObserver" in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { mountGiscus(); io.disconnect(); }
-      });
-    }, { rootMargin: "200px" });
-    io.observe($("#giscusHost"));
-    setTimeout(mountGiscus, 1200);
-  } else {
-    mountGiscus();
-  }
-
-  /* 接收 giscus 消息：拿到讨论数 / 换主题 / 判断是否装好 */
-  window.addEventListener("message", function (event) {
-    if (event.origin !== "https://giscus.app") return;
-    var data = event.data;
-    if (!data || typeof data !== "object" || !data.giscus) return;
-    var g = data.giscus;
-    giscusFrame = document.querySelector("iframe.giscus-frame");
-    if (g.discussion) {
-      giscusReady = true;
-      var sk = $("#skeleton"); if (sk) sk.remove();
-      var total = 0;
-      if (typeof g.discussion.totalCommentCount === "number") {
-        total = g.discussion.totalCommentCount;
-      } else if (typeof g.discussion.commentCount === "number") {
-        total = g.discussion.commentCount;
-      }
-      $("#count").textContent = total > 0 ? total + " 条留言" : "还没有人留言，来当第一个吧";
-    }
-    if (g.error) {
-      giscusReady = false;
-      var errorText = String(g.error);
-      $("#count").textContent = "评论区不可用";
-      if (/not installed|未安装/i.test(errorText)) {
-        toast("评论区还没装好：需要站长装一次 giscus");
-      }
-    }
-  });
-
+  /* ---------------- 提示 ---------------- */
   var toastEl = $("#toast"), toastTimer = null;
   function toast(msg) {
     toastEl.textContent = msg;
     toastEl.dataset.show = "true";
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toastEl.dataset.show = "false"; }, 2600);
+    toastTimer = setTimeout(function () { toastEl.dataset.show = "false"; }, 2400);
   }
+
+  /* ---------------- 心情选择 ---------------- */
+  var moodsEl = $("#moods");
+  moodsEl.innerHTML = MOODS.map(function (m, i) {
+    return '<button class="mood" type="button" data-mood="' + m + '" aria-pressed="' + (i === 0) + '" title="选这个心情">' + m + "</button>";
+  }).join("");
+  moodsEl.addEventListener("click", function (e) {
+    var btn = e.target.closest(".mood");
+    if (!btn) return;
+    currentMood = btn.dataset.mood;
+    Array.prototype.forEach.call(moodsEl.children, function (b) {
+      b.setAttribute("aria-pressed", String(b === btn));
+    });
+  });
+
+  /* ---------------- 字数 ---------------- */
+  var textEl = $("#text"), counter = $("#counter");
+  textEl.addEventListener("input", function () {
+    var n = textEl.value.length;
+    counter.textContent = n + " / 500";
+    counter.classList.toggle("over", n > 500);
+  });
+
+  /* ---------------- 昵称记忆 ---------------- */
+  var nameEl = $("#name");
+  try {
+    var savedName = localStorage.getItem("linao-guestbook-name");
+    if (savedName) nameEl.value = savedName;
+  } catch (e) {}
+
+  /* ---------------- 渲染 ---------------- */
+  var listEl = $("#list"), countEl = $("#count");
+  var serverList = [];   // 服务端最近一次拿到的列表
+  var pending = [];      // 刚发出去、服务端列表还没来得及更新的（KV 有 ~30s 延迟）
+
+  function timeText(ts) {
+    var diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60) return "刚刚";
+    if (diff < 3600) return Math.floor(diff / 60) + " 分钟前";
+    if (diff < 86400) return Math.floor(diff / 3600) + " 小时前";
+    if (diff < 86400 * 30) return Math.floor(diff / 86400) + " 天前";
+    var d = new Date(ts);
+    return d.getFullYear() + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + ("0" + d.getDate()).slice(-2);
+  }
+
+  function renderList(messages) {
+    if (!messages.length) {
+      listEl.innerHTML = '<div class="state">还没有人留言，<b>来当第一个吧</b> 🌿</div>';
+      countEl.textContent = "0 条留言";
+      return;
+    }
+    listEl.innerHTML = messages.map(function (m) {
+      var isPending = m.__pending;
+      return (
+        '<article class="msg">' +
+          '<span class="msg-avatar" aria-hidden="true">' + (MOODS.indexOf(m.mood) >= 0 ? m.mood : "🌿") + "</span>" +
+          '<div class="msg-body">' +
+            '<div class="msg-top">' +
+              '<span class="msg-name">' + esc(m.name) + "</span>" +
+              '<span class="msg-time">' + (isPending ? "刚刚 · 发送成功" : timeText(m.at)) + "</span>" +
+            "</div>" +
+            '<p class="msg-text">' + esc(m.text) + "</p>" +
+          "</div>" +
+        "</article>"
+      );
+    }).join("");
+    countEl.textContent = messages.length + " 条留言";
+  }
+
+  // 合并：服务端列表在前，还没同步过来的「刚发的」并进去，同步到就自动去掉
+  function paint(list) {
+    serverList = list || serverList;
+    var seen = {};
+    serverList.forEach(function (m) { seen[m.id] = true; });
+    pending = pending.filter(function (m) { return !seen[m.id]; });
+    renderList(pending.map(function (m) { return Object.assign({ __pending: true }, m); }).concat(serverList));
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  function loadMessages() {
+    return fetch(API_BASE + "/api/messages?limit=60", { headers: { Accept: "application/json" } })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.ok) throw new Error(data.message || "读取失败");
+        paint(data.messages || []);
+      })
+      .catch(function (err) {
+        if (serverList.length || pending.length) return; // 已经有内容就别把列表清空
+        listEl.innerHTML =
+          '<div class="state">留言暂时读不出来…<br />' +
+          "可能是后端还在路上，稍后再刷新看看 · <b>" + esc(String(err.message || err)) + "</b></div>";
+        countEl.textContent = "离线";
+      });
+  }
+
+  /* ---------------- 提交 ---------------- */
+  var form = $("#form"), submitBtn = $("#submit");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var text = textEl.value.trim();
+    var name = nameEl.value.trim();
+
+    if (!text) { toast("还没写字呢～"); textEl.focus(); return; }
+    if (text.length > 500) { toast("太长了，砍到 500 字以内吧"); return; }
+
+    submitBtn.disabled = true;
+    var oldLabel = submitBtn.innerHTML;
+    submitBtn.textContent = "发送中…";
+
+    fetch(API_BASE + "/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name, text: text, mood: currentMood, hp: $("#hp").value })
+    })
+      .then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); })
+      .then(function (res) {
+        if (!res.data.ok) throw new Error(res.data.message || "发送失败");
+        // 先本地插进去：KV 的列表有几十秒延迟，不能让人以为自己没发出去
+        if (res.data.message) {
+          pending.unshift(res.data.message);
+          paint(serverList);
+        }
+        textEl.value = "";
+        counter.textContent = "0 / 500";
+        if (name) { try { localStorage.setItem("linao-guestbook-name", name); } catch (err) {} }
+        toast("留言成功，谢谢你来 ♡");
+        setTimeout(loadMessages, 1500);
+        setTimeout(loadMessages, 20000);
+        setTimeout(loadMessages, 45000);
+      })
+      .catch(function (err) {
+        toast(String(err.message || "发送失败，稍后再试"));
+      })
+      .then(function () {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = oldLabel;
+      });
+  });
+
+  loadMessages();
+  setInterval(loadMessages, 60000);
 })();
 </script>
 </body>
